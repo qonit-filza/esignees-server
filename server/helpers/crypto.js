@@ -16,7 +16,7 @@ const generateKeyPair = () => {
   publicKeyString = publicKey.toString('base64');
   privateKeyString = privateKey.toString('base64');
 
-  return [publicKeyString, privateKeyStrings];
+  return [privateKeyString, publicKeyString];
 };
 
 const signPdf = (privateKeyString, docPath) => {

@@ -1,6 +1,7 @@
 const { User, Company, sequelize } = require('../models/index');
 const { createToken, decodedToken } = require('../helpers/jwt');
 const { comparePassword, hashPassword } = require('../helpers/bcrypt');
+const { generateKeyPair } = require('../helpers/crypto');
 
 class Controller {
   // REGISTER COMPANY AND USER OR USER ONLY
@@ -23,6 +24,9 @@ class Controller {
         ktpId,
         ktpImage,
       } = req.body;
+
+      const [privateKey, publicKey] = generateKeyPair();
+
       if (!companyInviteCode) {
         let result = await sequelize.transaction(async (t) => {
           let data = await Company.create(
@@ -46,6 +50,7 @@ class Controller {
               password,
               jobTitle,
               ktpId,
+              publicKey,
               ktpImage,
               CompanyId: data.id,
             },
@@ -55,6 +60,7 @@ class Controller {
         return res.status(201).json({
           message:
             'Dear, Your company and account is in verification process. log-in after we send notification in your email',
+          privateKey,
         });
       }
       let findCompany = await Company.findOne({ where: { companyInviteCode } });

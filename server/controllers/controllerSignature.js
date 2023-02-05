@@ -39,7 +39,26 @@ class Controller {
     }
   }
 
-  static async getSignature() {}
+  static async getSignature(req, res, next) {
+    try {
+      let { access_token } = req.headers;
+      let decode = decodedToken(access_token);
+      let user = await User.findByPk(decode.id);
+      if (!user) {
+        throw { name: 'NotFoundUser' };
+      }
+
+      const signature = await Signature.findOne({
+        where: {
+          UserId: user.id,
+        },
+      });
+
+      res.status(200).json({ signature: signature.signatureImage });
+    } catch (error) {
+      next(error);
+    }
+  }
 
   static async editSignature() {}
 

@@ -48,8 +48,8 @@ module.exports = (sequelize, DataTypes) => {
       modelName: 'Message',
     }
   );
-  Message.beforeCreate((item) => {
-    return (item.status = 'Send');
-  });
+  // Message.beforeCreate((item) => {
+  //   return (item.status = 'Send');
+  // });
   return Message;
 };

@@ -12,7 +12,7 @@ module.exports = {
       metaTitle: {
         type: Sequelize.STRING,
       },
-      documentUrl: {
+      documentPath: {
         type: Sequelize.STRING,
       },
       digitalSignature: {

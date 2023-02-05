@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   Document.init(
     {
       metaTitle: DataTypes.STRING,
-      documentUrl: DataTypes.STRING,
+      documentPath: DataTypes.STRING,
       digitalSignature: DataTypes.TEXT,
       MessageId: DataTypes.INTEGER,
       UserId: DataTypes.INTEGER,

@@ -38,7 +38,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       publicKey: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
       ktpImage: {
         allowNull : false,

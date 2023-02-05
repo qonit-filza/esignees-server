@@ -1,7 +1,5 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Message extends Model {
     /**
@@ -11,43 +9,47 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Message.belongsTo(models.User, {foreignKey: "UserIdSender"})
-      Message.belongsTo(models.User, {foreignKey: "UserIdReceiver"})
+      Message.belongsTo(models.User, { foreignKey: 'UserIdSender' });
+      Message.belongsTo(models.User, { foreignKey: 'UserIdReceiver' });
+      Message.hasMany(models.Document);
     }
   }
-  Message.init({
-    message: {
-      type : DataTypes.STRING,
-      allowNull : false,
-      validate: {
-        notNull: {
-          msg: `Please insert your message for your friend`,
+  Message.init(
+    {
+      message: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: `Please insert your message for your friend`,
+          },
+          notEmpty: {
+            msg: `Please insert your message for your friend`,
+          },
         },
-        notEmpty: {
-          msg: `Please insert your message for your friend`,
+      },
+      status: DataTypes.STRING,
+      UserIdSender: DataTypes.INTEGER,
+      UserIdReceiver: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: `your email friend is required`,
+          },
+          notEmpty: {
+            msg: `your email friend is required`,
+          },
         },
       },
     },
-    status: DataTypes.STRING,
-    UserIdSender: DataTypes.INTEGER,
-    UserIdReceiver: {
-      type : DataTypes.INTEGER,
-      allowNull : false,
-      validate: {
-        notNull: {
-          msg: `your email friend is required`,
-        },
-        notEmpty: {
-          msg: `your email friend is required`,
-        },
-      },
-    },
-  }, {
-    sequelize,
-    modelName: 'Message',
-  });
-  Message.beforeCreate((item)=>{
-    return item.status = "Send"
-  })
+    {
+      sequelize,
+      modelName: 'Message',
+    }
+  );
+  // Message.beforeCreate((item) => {
+  //   return (item.status = 'Send');
+  // });
   return Message;
 };

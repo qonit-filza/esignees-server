@@ -5,6 +5,8 @@ const {authetication} = require("../middlewares/authetication")
 const user = require("./user")
 router.use("/", user)
 
+const admin = require("./admin")
+router.use("/adm", admin)
 
 router.use(authetication)
 

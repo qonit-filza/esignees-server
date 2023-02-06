@@ -25,11 +25,4 @@ router.use('/signatures', signatures);
 const documents = require('./document');
 router.use('/documents', documents);
 
-const signatures = require('./signature');
-router.use('/signatures', signatures);
-
-const documents = require('./document');
-router.use('/documents', documents);
-
 module.exports = router;
-

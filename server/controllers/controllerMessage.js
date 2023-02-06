@@ -10,6 +10,7 @@ const { signPdf, verifyPdf, verifyPrivateKey } = require('../helpers/crypto');
 const exiftool = require('node-exiftool');
 const exiftoolBin = require('dist-exiftool');
 const ep = new exiftool.ExiftoolProcess(exiftoolBin);
+const editMetaTitle = require('../helpers/exiftool');
 
 class Controller {
   // SEND MESSAGE
@@ -196,6 +197,33 @@ class Controller {
       res.status(201).json({ message: result });
     } catch (error) {
       next(error);
+    }
+  }
+
+  static async replyMessage(req, res, next) {
+    try {
+      const { docName, email, message, privateKey, messageId } = req.body;
+      console.log(req.file);
+      console.log(req.body);
+
+      await editMetaTitle(docName, req.file.path);
+
+      const result = await sequelize.transaction(async (t) => {
+        const updateMessage = await Message.update(
+          {
+            message,
+            status: 'completed',
+          },
+          {
+            where: { id: +messageId },
+          },
+          {
+            transaction: t,
+          }
+        );
+      });
+    } catch (error) {
+      console.log(error);
     }
   }
 

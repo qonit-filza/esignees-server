@@ -1,6 +1,7 @@
 const { comparePassword, hashPassword } = require("../helpers/bcrypt");
 const { createToken } = require("../helpers/jwt");
 const { Admin, User, Company } = require("../models");
+const {Op} = require("sequelize")
 
 class AdminController {
   static async adminLogin(req, res, next) {
@@ -53,7 +54,8 @@ class AdminController {
 
   static async fetchUser(req, res, next) {
     try {
-      let user = await User.findAll({
+      let {search} = req.query
+      const paramQuerySQL = {
         include: {
           model: Company,
           as: "Company",
@@ -61,6 +63,27 @@ class AdminController {
             exclude: ["createdAt", "updatedAt"],
           },
         },
+        order: [["createdAt", "DESC"]]
+      };
+
+      if (search) {
+        paramQuerySQL.where = {
+          name: { [Op.iLike]: `%${search}%` },
+        };
+      }
+
+      let user = await User.findAll(paramQuerySQL);
+      res.status(200).json(user);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async userDetail(req, res, next) {
+    try {
+      let { id } = req.params;
+      let user = await User.findByPk(id, {
+        include : ["Company"]
       });
       res.status(200).json(user);
     } catch (error) {

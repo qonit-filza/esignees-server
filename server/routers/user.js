@@ -6,8 +6,7 @@ const {authetication} = require("../middlewares/authetication")
 router.post("/register", ControllerUser.registerCompany)
 router.post("/login", ControllerUser.login)
 
-router.use(authetication)
-router.get("/profiles", ControllerUser.profileDetail)
-router.put("/profiles", ControllerUser.editProfile)
+router.get("/profiles", authetication, ControllerUser.profileDetail)
+router.put("/profiles", authetication, ControllerUser.editProfile)
 
 module.exports = router

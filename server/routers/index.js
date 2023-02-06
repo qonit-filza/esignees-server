@@ -18,3 +18,6 @@ router.use('/sents', message);
 
 const notification = require('./notification');
 router.use('/notifications', notification);
+
+
+module.exports = router

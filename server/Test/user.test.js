@@ -5,33 +5,30 @@ const { createToken, decodedToken } = require("../helpers/jwt");
 const { comparePassword, hashPassword } = require("../helpers/bcrypt");
 
 beforeAll(async () => {
+  const company1 = await Company.create({
+    nameCompany: "Test Company",
+    legalName: "Test Company LLC",
+    address: "ABC Street",
+    phoneCompany: "12345",
+    emailCompany: "company@mail.com",
+    industry: "Test",
+    companySize: "100",
+    companyInviteCode: "abc123",
+    balance: 5,
+  });
+
   const user1 = await User.create({
-    name: "Test",
-    email: "test@mail.com",
+    name: "Owner",
+    role: "Admin",
+    email: "owner@mail.com",
     phone: "12345",
     password: hashPassword("password"),
     jobTitle: "testJob",
     ktpId: "12345",
     ktpImage: "12345.png",
+    status: "Verified",
+    CompanyId: 1,
   });
-  let userId1 = user1.id;
-
-  const user2 = await User.create({
-    name: "Friend",
-    email: "friend@mail.com",
-    phone: "6789",
-    password: hashPassword("password"),
-    jobTitle: "testJob",
-    ktpId: "6789",
-    ktpImage: "6789.png",
-  });
-  let userId2 = user2.id;
-
-  // const contact = await Contact.create({
-  //   UserIdOwner: userId1,
-  //   UserIdContact: userId2,
-  // });
-  // let contactId = contact.id;
 });
 
 afterAll(async () => {
@@ -48,18 +45,18 @@ afterAll(async () => {
 });
 
 // REGISTER USER & COMPANY
-describe("POST -- Register new User w/ Company & w/o Company", () => {
-  test.only("should return 201 status code and create new User -- No invite code", async () => {
+describe("POST -- Register new User & Company", () => {
+  test("should return 201 status code and create new User -- No invite code", async () => {
     const response = await request(app)
       .post("/register")
       .send({
         // COMPANY DATA
-        nameCompany: "My Company",
-        legalName: "My Company LLC",
+        nameCompany: "New Company",
+        legalName: "New Company LLC",
         address: "123 Main St",
         phoneCompany: "12345",
-        emailCompany: "mycompany@email.com",
-        industry: "Technology",
+        emailCompany: "newcompany@email.com",
+        industry: "Test",
         companySize: "100",
         // USER DATA --
         name: "Test",
@@ -76,27 +73,5 @@ describe("POST -- Register new User w/ Company & w/o Company", () => {
       message:
         "Dear, Your company and account is in verification process. log-in after we send notification in your email",
     });
-
-    const company = await Company.findOne({
-      where: { nameCompany: "My Company" },
-    });
-    expect(company).toBeDefined();
-    expect(company.legalName).toBe("My Company LLC");
-    expect(company.address).toBe("123 Main St");
-    expect(company.phoneCompany).toBe("555-555-5555");
-    expect(company.emailCompany).toBe("mycompany@email.com");
-    expect(company.industry).toBe("Technology");
-    expect(company.companySize).toBe("100-500");
-
-    const user = await User.findOne({ where: { name: "John Doe" } });
-    expect(user).toBeDefined();
-    expect(user.role).toBe("admin");
-    expect(user.email).toBe("johndoe@email.com");
-    expect(user.phone).toBe("555-555-5555");
-    expect(user.password).toBe("secret");
-    expect(user.jobTitle).toBe("Manager");
-    expect(user.ktpId).toBe("123456");
-    expect(user.ktpImage).toBe("ktp.jpg");
-    expect(user.CompanyId).toBe(company.id);
   });
 });

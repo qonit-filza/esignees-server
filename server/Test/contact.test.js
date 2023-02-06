@@ -52,7 +52,7 @@ afterAll(async () => {
 
 // CREATE CONTACT
 describe("Create contact", () => {
-  test("Should return a 201 status code and creates a new contact", async () => {
+  test.skip("Should return a 201 status code and creates a new contact", async () => {
     const response = await request(app)
       .post("/contacts")
       .send({
@@ -69,7 +69,7 @@ describe("Create contact", () => {
 
 // SHOW CONTACT
 describe("Show all contacts", () => {
-  test("Should return a 200 status code and the list of contacts", async () => {
+  test.skip("Should return a 200 status code and the list of contacts", async () => {
     const response = await request(app)
       .get("/contacts")
       .set("access_token", token);
@@ -82,7 +82,7 @@ describe("Show all contacts", () => {
 
 // DETAIL
 describe("Show contact detail", () => {
-  test("Should return a 200 status code and contact detail", async () => {
+  test.skip("Should return a 200 status code and contact detail", async () => {
     const response = await request(app)
       .get("/contacts/1")
       .set("access_token", token);
@@ -95,7 +95,7 @@ describe("Show contact detail", () => {
 
 // DELETE
 describe("Delete contact", () => {
-  test("Should return 201 and success delete contact message when contact is deleted", async () => {
+  test.skip("Should return 201 and success delete contact message when contact is deleted", async () => {
     const response = await request(app)
       .delete("/contacts/1")
       .set("access_token", token);

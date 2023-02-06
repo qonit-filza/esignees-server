@@ -1,25 +1,44 @@
 const request = require("supertest");
-const app = require("./app");
-const User = require("./models");
-const Contact = require("./models");
+const app = require("../app");
+const User = require("../models");
+const Contact = require("../models");
+const { hashPassword } = require("../helpers/bcrypt");
+const { createToken } = require("../helpers/jwt");
 
-// beforeAll(async () => {
-//   const user = await User.create({
-//     email: "test@mail.com",
-//     password: "password",
-//   });
-//   let userId = user.id;
-//   const contact = await Contact.create({
-//     UserIdOwner: userId,
-//     UserIdContact: 2,
-//   });
-//   let contactId = contact.id;
-// });
+beforeAll(async () => {
+  const user1 = await User.create({
+    email: "test@mail.com",
+    password: hashPassword("password"),
+  });
+  let userId1 = user1.id;
+  let token = createToken({ id: 1, email: user1.email });
+  console.log(userId1, "<<<>>>", token);
 
-// afterAll(async () => {
-//   await User.destroy({ where: {} });
-//   await Contact.destroy({ where: {} });
-// });
+  const user2 = await User.create({
+    email: "friend@mail.com",
+    password: hashPassword("password"),
+  });
+  let userId2 = user2.id;
+
+  const contact = await Contact.create({
+    UserIdOwner: userId1,
+    UserIdContact: userId2,
+  });
+  let contactId = contact.id;
+});
+
+afterAll(async () => {
+  await User.destroy({
+    truncate: true,
+    cascade: true,
+    restartIdentity: true,
+  });
+  await Contact.destroy({
+    truncate: true,
+    cascade: true,
+    restartIdentity: true,
+  });
+});
 
 // CREATE CONTACT
 describe("Create contact", () => {
@@ -39,7 +58,7 @@ describe("Create contact", () => {
 
 // SHOW CONTACT
 describe("Show all contacts", () => {
-  it("Should return a 200 status code and the list of contacts", async () => {
+  test("Should return a 200 status code and the list of contacts", async () => {
     const response = await request(app)
       .get("/contacts")
       .set("Authorization", "string");
@@ -52,7 +71,7 @@ describe("Show all contacts", () => {
 
 // DETAIL
 describe("Show contact detail", () => {
-  it("Should return a 200 status code and contact detail", async () => {
+  test("Should return a 200 status code and contact detail", async () => {
     const response = await request(app)
       .get("/contacts/1")
       .set("Authorization", "string");
@@ -65,7 +84,7 @@ describe("Show contact detail", () => {
 
 // DELETE
 describe("Delete contact", () => {
-  it("Should return 201 and success delete contact message when contact is deleted", async () => {
+  test("Should return 201 and success delete contact message when contact is deleted", async () => {
     const response = await request(app)
       .delete(`/contacts/1`)
       .set("Authorization", "string")

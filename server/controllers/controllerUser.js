@@ -1,7 +1,7 @@
-const { User, Company, sequelize } = require('../models/index');
-const { createToken, decodedToken } = require('../helpers/jwt');
-const { comparePassword, hashPassword } = require('../helpers/bcrypt');
-const { generateKeyPair } = require('../helpers/crypto');
+const { User, Company, sequelize } = require("../models/index");
+const { createToken, decodedToken } = require("../helpers/jwt");
+const { comparePassword, hashPassword } = require("../helpers/bcrypt");
+const { generateKeyPair } = require("../helpers/crypto");
 
 class Controller {
   // REGISTER COMPANY AND USER OR USER ONLY
@@ -44,7 +44,7 @@ class Controller {
           let userCompany = await User.create(
             {
               name,
-              role: 'admin',
+              role: "admin",
               email,
               phone,
               password,
@@ -59,17 +59,17 @@ class Controller {
         });
         return res.status(201).json({
           message:
-            'Dear, Your company and account is in verification process. log-in after we send notification in your email',
+            "Dear, Your company and account is in verification process. log-in after we send notification in your email",
           privateKey,
         });
       }
       let findCompany = await Company.findOne({ where: { companyInviteCode } });
       if (!findCompany) {
-        throw { name: 'NotFoundCompany' };
+        throw { name: "NotFoundCompany" };
       }
       let user = await User.create({
         name,
-        role: 'staff',
+        role: "staff",
         email,
         phone,
         password,
@@ -80,11 +80,12 @@ class Controller {
       });
       return res.status(201).json({
         message:
-          'Dear, ' +
+          "Dear, " +
           user.name +
-          '. Your account is in verification process. log-in after we send notification in your email',
+          ". Your account is in verification process. log-in after we send notification in your email",
       });
     } catch (error) {
+      console.log(error);
       next(error);
     }
   }
@@ -94,12 +95,12 @@ class Controller {
     try {
       let { email, password } = req.body;
       if (!email || !password) {
-        throw { name: 'BadRequest' };
+        throw { name: "BadRequest" };
       }
 
       let user = await User.findOne({ where: { email } });
       if (!user) {
-        throw { name: 'InvalidCredentials' };
+        throw { name: "InvalidCredentials" };
       }
       // if (user.status === "Unverified") {
       //   throw { name: "OnProcess" };
@@ -107,7 +108,7 @@ class Controller {
 
       let compare = comparePassword(password, user.password);
       if (!compare) {
-        throw { name: 'InvalidCredentials' };
+        throw { name: "InvalidCredentials" };
       }
       let payload = {
         id: user.id,
@@ -147,7 +148,7 @@ class Controller {
       let decode = decodedToken(access_token);
       let user = await User.findByPk(decode.id);
       if (!user) {
-        throw { name: 'NotFoundUser' };
+        throw { name: "NotFoundUser" };
       }
       let edit = await User.update(
         {
@@ -161,7 +162,7 @@ class Controller {
       );
       res
         .status(201)
-        .json({ message: 'success edit your account ' + user.name });
+        .json({ message: "success edit your account " + user.name });
     } catch (error) {
       next(error);
     }

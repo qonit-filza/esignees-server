@@ -19,9 +19,6 @@ router.use("/sents", message);
 const notification = require("./notification");
 router.use("/notifications", notification);
 
-const notification = require("./notification");
-router.use("/notifications", notification);
-
 const signatures = require("./signature");
 router.use("/signatures", signatures);
 

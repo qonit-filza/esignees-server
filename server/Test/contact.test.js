@@ -3,8 +3,9 @@ const app = require("../app");
 const { User, Contact } = require("../models");
 const { hashPassword } = require("../helpers/bcrypt");
 const { createToken } = require("../helpers/jwt");
-let token = "";
 
+let token = "";
+let token2 = "";
 beforeAll(async () => {
   const user1 = await User.create({
     name: "Test",
@@ -17,7 +18,7 @@ beforeAll(async () => {
   });
   let userId1 = user1.id;
   token = createToken({ id: 1, email: user1.email });
-  // console.log(userId1, "<<<>>>", token);
+  token2 = createToken({ id: 999, email: "NUser@mail.com" });
 
   const user2 = await User.create({
     name: "Friend",
@@ -52,7 +53,7 @@ afterAll(async () => {
 
 // CREATE CONTACT
 describe("Create contact", () => {
-  test.skip("Should return a 201 status code and creates a new contact", async () => {
+  test("201 -- Create new Contact", async () => {
     const response = await request(app)
       .post("/contacts")
       .send({
@@ -65,11 +66,35 @@ describe("Create contact", () => {
     expect(response.body).toHaveProperty("UserIdOwner");
     expect(response.body).toHaveProperty("UserIdContact");
   });
+
+  test("401 -- Unauthorized", async () => {
+    const response = await request(app)
+      .post("/contacts")
+      .send({
+        email: "friend@mail.com",
+      })
+      .set("access_token", token2);
+
+    expect(response.statusCode).toEqual(401);
+    expect(response.body.message).toEqual("Login First");
+  });
+
+  test("404 -- Not Found User", async () => {
+    const response = await request(app)
+      .post("/contacts")
+      .send({
+        email: "a@mail.com",
+      })
+      .set("access_token", token);
+
+    expect(response.statusCode).toEqual(404);
+    expect(response.body.message).toEqual("User not found");
+  });
 });
 
 // SHOW CONTACT
 describe("Show all contacts", () => {
-  test.skip("Should return a 200 status code and the list of contacts", async () => {
+  test("200 -- Show all contacts", async () => {
     const response = await request(app)
       .get("/contacts")
       .set("access_token", token);
@@ -78,11 +103,30 @@ describe("Show all contacts", () => {
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body.length).toBeGreaterThan(0);
   });
+
+  test("401 -- Unauthorized", async () => {
+    const response = await request(app)
+      .get("/contacts")
+      .set("access_token", token2);
+
+    expect(response.statusCode).toEqual(401);
+    expect(response.body.message).toEqual("Login First");
+  });
+
+  // test("500 -- Internal Server Error", async () => {
+  //   const response = await request(app)
+  //     .get("/contacts")
+  //     .send({})
+  //     .set("access_token", token);
+
+  //   expect(response.statusCode).toEqual(500);
+  //   expect(response.body.message).toEqual("Internal server error");
+  // });
 });
 
 // DETAIL
 describe("Show contact detail", () => {
-  test.skip("Should return a 200 status code and contact detail", async () => {
+  test("200 -- Show friend", async () => {
     const response = await request(app)
       .get("/contacts/1")
       .set("access_token", token);
@@ -91,16 +135,34 @@ describe("Show contact detail", () => {
     expect(response.body).toHaveProperty("id");
     expect(response.body).toHaveProperty("email");
   });
+
+  test("404 -- Friend not found", async () => {
+    const response = await request(app)
+      .get("/contacts/999")
+      .set("access_token", token);
+
+    expect(response.statusCode).toBe(404);
+    expect(response.body.message).toEqual("Friend not found on your contact");
+  });
 });
 
 // DELETE
 describe("Delete contact", () => {
-  test.skip("Should return 201 and success delete contact message when contact is deleted", async () => {
+  test("201 -- Friend deleted", async () => {
     const response = await request(app)
       .delete("/contacts/1")
       .set("access_token", token);
 
     expect(response.statusCode).toBe(201);
     expect(response.body.message).toBe("success delete contact");
+  });
+
+  test("404 -- Friend not found", async () => {
+    const response = await request(app)
+      .delete("/contacts/999")
+      .set("access_token", token);
+
+    expect(response.statusCode).toBe(404);
+    expect(response.body.message).toBe("Friend not found on your contact");
   });
 });

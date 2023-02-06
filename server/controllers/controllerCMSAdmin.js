@@ -44,6 +44,7 @@ class AdminController {
       });
       res.status(201).json({
         id: admin.id,
+        name: admin.name,
         email: admin.email,
       });
     } catch (error) {
@@ -76,12 +77,12 @@ class AdminController {
       let data = await User.findByPk(id);
 
       await User.update(
-        { status : "Verified" },
+        { status },
         {
           where: { id },
         }
       );
-      res.status(201).json({
+      res.status(200).json({
         message: `success update status ${data.name} from ${data.status} to ${status}`,
       });
     } catch (error) {
@@ -102,7 +103,7 @@ class AdminController {
         where: { id },
       });
 
-      res.status(201).json({
+      res.status(200).json({
         message: `${data.name} success to delete`,
       });
     } catch (error) {

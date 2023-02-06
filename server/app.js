@@ -1,6 +1,6 @@
-if (process.env.NODE_ENV !== "production"){
-    require("dotenv").config();
-  }
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const multer = require("multer");
@@ -23,8 +23,8 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT || 3000;
 const cors = require("cors");
-const router = require("./routers")
-const {errorHandler} = require("./middlewares/errorHandler")
+const router = require("./routers");
+const { errorHandler } = require("./middlewares/errorHandler");
 // const storage = multer.diskStorage({
 //     destination: (req, file, cb) => {
 //       cb(null, './uploads/');
@@ -41,7 +41,9 @@ app.use(express.json());
 app.use(router);
 app.use(errorHandler);
 app.listen(port, () => {
-    console.log(`Esigness app listening on port ${port}`);
+  console.log(`Esigness app listening on port ${port}`);
 });
+
+module.exports = app;
 
 // , upload.single("ktpImage")

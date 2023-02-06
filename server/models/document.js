@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Document.init(
     {
+      documentName: DataTypes.STRING,
       metaTitle: DataTypes.STRING,
       documentPath: DataTypes.STRING,
       digitalSignature: DataTypes.TEXT,

@@ -54,6 +54,8 @@ class Controller {
         },
       });
 
+      //if null need to add signature
+
       res.status(200).json({ signature: signature.signatureImage });
     } catch (error) {
       console.log(error);

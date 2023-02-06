@@ -13,7 +13,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'UserIdSender',
         as: 'Sender',
       });
-      Message.belongsTo(models.User, { foreignKey: 'UserIdReceiver' });
+      Message.belongsTo(models.User, {
+        foreignKey: 'UserIdReceiver',
+        as: 'Receiver',
+      });
       Message.hasMany(models.Document);
     }
   }

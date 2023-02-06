@@ -14,8 +14,13 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.Contact, { foreignKey: 'UserIdOwner' });
       User.hasMany(models.Contact, { foreignKey: 'UserIdContact' });
       User.hasMany(models.Notification, { foreignKey: 'UserId' });
-      User.hasMany(models.Message, { foreignKey: 'UserIdSender' });
-      User.hasMany(models.Message, { foreignKey: 'UserIdReceiver' });
+      User.hasMany(models.Message, {
+        foreignKey: 'UserIdSender',
+        as: 'Sender',
+      });
+      User.hasMany(models.Message, {
+        foreignKey: 'UserIdReceiver',
+      });
       User.hasOne(models.Signature);
       User.hasMany(models.Document);
     }

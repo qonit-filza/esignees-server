@@ -147,9 +147,9 @@ class Controller {
       let { name, email, password, phone, jobTitle } = req.body;
       let decode = decodedToken(access_token);
       let user = await User.findByPk(decode.id);
-      if (!user) {
-        throw { name: "NotFoundUser" };
-      }
+      // if (!user) {
+      //   throw { name: "NotFoundUser" };
+      // }
       let edit = await User.update(
         {
           name,
@@ -158,7 +158,7 @@ class Controller {
           phone,
           jobTitle,
         },
-        { where: { id: user.id } }
+        { where: { id: decode.id } }
       );
       res
         .status(201)

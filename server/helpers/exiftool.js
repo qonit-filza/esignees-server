@@ -2,12 +2,8 @@ const exiftool = require('node-exiftool');
 const exiftoolBin = require('dist-exiftool');
 const ep = new exiftool.ExiftoolProcess(exiftoolBin);
 
-const editMetaTitle = async (docName, filePath) => {
+const editMetaTitle = async (docName, filePath, newMetaTitle) => {
   try {
-    const date = new Date();
-    const newMetaTitle =
-      ' cobaterakhir' + docName + '-' + date.toLocaleString('id-ID');
-
     await ep.open();
     const write = await ep.writeMetadata(
       filePath,

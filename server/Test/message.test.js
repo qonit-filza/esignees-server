@@ -31,17 +31,6 @@ beforeAll(async () => {
     CompanyId: company1.id,
   });
 
-  token = createToken({
-    id: user1.id,
-    name: user1.name,
-    idCompany: user1.CompanyId,
-  });
-  token2 = createToken({
-    id: 999,
-    name: "aaa",
-    idCompany: 1,
-  });
-
   const user2 = await User.create({
     name: "Friend",
     email: "friend@mail.com",
@@ -52,6 +41,17 @@ beforeAll(async () => {
     ktpImage: "6789.png",
     status: "Verified",
     CompanyId: company1.id,
+  });
+
+  token = createToken({
+    id: user1.id,
+    name: user1.name,
+    idCompany: user1.CompanyId,
+  });
+  token2 = createToken({
+    id: 999,
+    name: "aaa",
+    idCompany: 1,
   });
 
   const msg = await Message.create({
@@ -91,36 +91,5 @@ afterAll(async () => {
     truncate: true,
     cascade: true,
     restartIdentity: true,
-  });
-});
-
-describe("GET Document", () => {
-  test("200 -- ONE", async () => {
-    const response = await request(app)
-      .get("/documents/1")
-      .set("access_token", token);
-
-    expect(response.statusCode).toEqual(200);
-  });
-  test("401 -- Unauthorized", async () => {
-    const response = await request(app)
-      .get("/documents/1")
-      .set("access_token", token2);
-
-    expect(response.statusCode).toEqual(401);
-  });
-  test("404 -- No Document found with that ID", async () => {
-    const response = await request(app)
-      .get("/documents/999")
-      .set("access_token", token);
-
-    expect(response.statusCode).toEqual(404);
-  });
-  test("500 -- OTHER", async () => {
-    const response = await request(app)
-      .get("/documents/1")
-      .set("access_token", token);
-
-    expect(response.statusCode).toEqual(500);
   });
 });

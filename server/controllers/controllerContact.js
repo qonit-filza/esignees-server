@@ -26,9 +26,9 @@ class Controller {
   static async showAllContact(req, res, next) {
     try {
       let { id } = req.user;
-      let contact = await Contact.findAll({ where: { UserIdOwner: id }});
+      let contact = await Contact.findAll({include: ['User'], where: { UserIdOwner: id }});
       if (!contact.length) {
-        let data = await Contact.findAll({ where: { UserIdContact: id }});
+        let data = await Contact.findAll({include: ['User'], where: { UserIdContact: id }});
         return res.status(200).json(data)
       }
       res.status(200).json(contact);

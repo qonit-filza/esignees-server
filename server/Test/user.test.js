@@ -4,7 +4,6 @@ const { Company, User } = require("../models");
 const { createToken } = require("../helpers/jwt");
 
 let invite = "";
-let falseToken = createToken({ id: 999, email: "NUser@mail.com" });
 
 beforeAll(async () => {
   const company1 = await Company.create({

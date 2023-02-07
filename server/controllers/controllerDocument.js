@@ -31,6 +31,10 @@ class Controller {
       const { Title } = await readMetaData(req.file.path);
       console.log({ Title });
 
+      if (!Title) {
+        throw { name: 'InvalidDocumentOrSignature' };
+      }
+
       const document = await Document.findOne({
         where: {
           metaTitle: Title,
@@ -102,23 +106,17 @@ class Controller {
           document.documentPath
         );
 
-        console.log(document.digitalSignature, '<<<<<<');
-
-        console.log(document.User.publicKey, '++++++');
-
-        console.log(document.documentPath, '///XXXX');
-
-        console.log({ status });
-
         if (!status) {
           throw { name: 'InvalidDocumentOrSignature' };
         }
 
-        message = {
-          signedBy: document.User.name,
-          signedByEmail: document.User.email,
-          signedDate: document.createdAt,
-        };
+        message = [
+          {
+            signedBy: document.User.name,
+            signedByEmail: document.User.email,
+            signedDate: document.createdAt,
+          },
+        ];
       }
 
       res.status(201).json({ status: 'Verified', detail: message });

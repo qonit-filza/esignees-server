@@ -13,17 +13,14 @@ router.use(authetication);
 const contact = require('./contact');
 router.use('/contacts', contact);
 
+const company = require('./company');
+router.use('/companies', company);
+
 const message = require('./message');
 router.use('/sents', message);
 
 const notification = require('./notification');
 router.use('/notifications', notification);
-
-const signatures = require('./signature');
-router.use('/signatures', signatures);
-
-const documents = require('./document');
-router.use('/documents', documents);
 
 const signatures = require('./signature');
 router.use('/signatures', signatures);

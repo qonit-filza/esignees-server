@@ -1,7 +1,8 @@
 const { comparePassword, hashPassword } = require("../helpers/bcrypt");
 const { createToken } = require("../helpers/jwt");
 const { Admin, User, Company } = require("../models");
-const {Op} = require("sequelize")
+const {Op} = require("sequelize");
+const { sendEmail } = require("../helpers/nodemailer");
 
 class AdminController {
   static async adminLogin(req, res, next) {
@@ -104,6 +105,7 @@ class AdminController {
           where: { id },
         }
       );
+      sendEmail(data.email, data.name)
       res.status(201).json({
         message: `success update status ${data.name} from ${data.status} to ${status}`,
       });

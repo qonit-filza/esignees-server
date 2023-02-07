@@ -85,14 +85,15 @@ module.exports = (sequelize, DataTypes) => {
     industry: DataTypes.STRING,
     companySize: DataTypes.STRING,
     companyInviteCode: DataTypes.STRING,
-    balance: DataTypes.INTEGER
+    status: DataTypes.STRING,
+    dueDate: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'Company',
   });
   Company.beforeCreate((item)=>{
-    item.balance = 5
     item.companyInviteCode = "E-signess-" + Math.floor(1000000 + Math.random()*9999999)
+    item.status = "Free"
     return item
   })
   return Company;

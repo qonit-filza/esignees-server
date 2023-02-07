@@ -10,13 +10,17 @@ async function authetication(req, res, next) {
 
     let payload = decodedToken(access_token);
     let dataUser = await User.findByPk(payload.id, {
-      include : ['Company']
+      include: ["Company"],
     });
     if (!dataUser) {
       throw { name: "Unauthorized" };
     }
 
-    req.user = { id: dataUser.id, name:dataUser.email, idCompany:dataUser.Company.id };
+    req.user = {
+      id: dataUser.id,
+      name: dataUser.email,
+      idCompany: dataUser.Company.id,
+    };
     next();
   } catch (error) {
     next(error);
@@ -36,11 +40,11 @@ async function autheticationAdm(req, res, next) {
       throw { name: "UnauthorizedAdmin" };
     }
 
-    req.user = { id: dataUser.id, name:dataUser.email };
+    req.user = { id: dataUser.id, name: dataUser.email };
     next();
   } catch (error) {
     next(error);
   }
 }
 
-module.exports = {authetication, autheticationAdm}
+module.exports = { authetication, autheticationAdm };

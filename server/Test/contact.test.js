@@ -1,12 +1,24 @@
 const request = require("supertest");
 const app = require("../app");
-const { User, Contact } = require("../models");
+const { User, Contact, Company } = require("../models");
 const { hashPassword } = require("../helpers/bcrypt");
 const { createToken } = require("../helpers/jwt");
 
 let token = "";
 let token2 = "";
+
 beforeAll(async () => {
+  const company1 = await Company.create({
+    nameCompany: "Test Company",
+    legalName: "Test Company LLC",
+    address: "ABC Street",
+    phoneCompany: "12345",
+    emailCompany: "company@mail.com",
+    industry: "Test",
+    companySize: "100",
+    balance: 5,
+  });
+
   const user1 = await User.create({
     name: "Test",
     email: "test@mail.com",
@@ -15,10 +27,16 @@ beforeAll(async () => {
     jobTitle: "testJob",
     ktpId: "12345",
     ktpImage: "12345.png",
+    CompanyId: company1.id,
   });
-  let userId1 = user1.id;
-  token = createToken({ id: 1, email: user1.email });
-  token2 = createToken({ id: 999, email: "NUser@mail.com" });
+
+  token = createToken({
+    id: user1.id,
+    name: user1.name,
+    idCompany: user1.CompanyId,
+  });
+
+  token2 = createToken({ id: 999, name: "NUser@mail.com", idCompany: 1 });
 
   const user2 = await User.create({
     name: "Friend",
@@ -28,18 +46,25 @@ beforeAll(async () => {
     jobTitle: "testJob",
     ktpId: "6789",
     ktpImage: "6789.png",
+    CompanyId: 1,
   });
+
+  let userId1 = user1.id;
   let userId2 = user2.id;
 
-  const contact = await Contact.create({
+  await Contact.create({
     UserIdOwner: userId1,
     UserIdContact: userId2,
   });
-  let contactId = contact.id;
 });
 
 afterAll(async () => {
   await User.destroy({
+    truncate: true,
+    cascade: true,
+    restartIdentity: true,
+  });
+  await Company.destroy({
     truncate: true,
     cascade: true,
     restartIdentity: true,
@@ -61,6 +86,7 @@ describe("Create contact", () => {
       })
       .set("access_token", token);
 
+    // console.log(response, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
     expect(response.statusCode).toEqual(201);
     expect(response.body).toHaveProperty("id");
     expect(response.body).toHaveProperty("UserIdOwner");
@@ -76,7 +102,7 @@ describe("Create contact", () => {
       .set("access_token", token2);
 
     expect(response.statusCode).toEqual(401);
-    expect(response.body.message).toEqual("Login First");
+    expect(response.body.message).toEqual("Unauthenticated");
   });
 
   test("404 -- Not Found User", async () => {
@@ -110,7 +136,7 @@ describe("Show all contacts", () => {
       .set("access_token", token2);
 
     expect(response.statusCode).toEqual(401);
-    expect(response.body.message).toEqual("Login First");
+    expect(response.body.message).toEqual("Unauthenticated");
   });
 
   // test("500 -- Internal Server Error", async () => {

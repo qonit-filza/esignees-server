@@ -47,6 +47,7 @@ class AdminController {
       });
       res.status(201).json({
         id: admin.id,
+        name: admin.name,
         email: admin.email,
       });
     } catch (error) {
@@ -130,7 +131,7 @@ class AdminController {
         where: { id },
       });
 
-      res.status(201).json({
+      res.status(200).json({
         message: `${data.name} success to delete`,
       });
     } catch (error) {

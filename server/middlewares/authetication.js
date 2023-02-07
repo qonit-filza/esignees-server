@@ -25,13 +25,13 @@ async function autheticationAdm(req, res, next) {
   try {
     let access_token = req.headers.access_token;
     if (!access_token) {
-      throw { name: "Unauthorized" };
+      throw { name: "UnauthorizedAdmin" };
     }
 
     let payload = decodedToken(access_token);
     let dataUser = await Admin.findByPk(payload.id);
     if (!dataUser) {
-      throw { name: "Unauthorized" };
+      throw { name: "UnauthorizedAdmin" };
     }
 
     req.user = { id: dataUser.id, name:dataUser.email };

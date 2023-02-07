@@ -16,6 +16,6 @@ const upload = multer({ storage: storage });
 router.post('/', upload.single('file'), ControllerMessage.sendMessage);
 router.get('/', ControllerMessage.showAllMessage);
 router.get('/:id', ControllerMessage.readMessage);
-router.put('/:id', ControllerMessage.changeMessage);
+router.put('/:id', upload.single('file'), ControllerMessage.changeMessage);
 
 module.exports = router;

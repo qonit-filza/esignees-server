@@ -9,6 +9,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      documentName: {
+        type: Sequelize.STRING,
+      },
       metaTitle: {
         type: Sequelize.STRING,
       },

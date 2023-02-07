@@ -10,6 +10,7 @@ const { signPdf, verifyPdf, verifyPrivateKey } = require('../helpers/crypto');
 const exiftool = require('node-exiftool');
 const exiftoolBin = require('dist-exiftool');
 const ep = new exiftool.ExiftoolProcess(exiftoolBin);
+const editMetaTitle = require('../helpers/exiftool');
 
 class Controller {
   // SEND MESSAGE
@@ -106,8 +107,6 @@ class Controller {
       //   console.log(req.file);
       //   console.log(req.body);
 
-      //completed sender sign receiver not
-
       const { docName, email, message, status, privateKey } = req.body;
 
       const UserIdSender = req.user.id;
@@ -181,6 +180,7 @@ class Controller {
 
         await Document.create(
           {
+            documentName: docName,
             metaTitle,
             documentPath: req.file.path,
             digitalSignature,
@@ -195,6 +195,65 @@ class Controller {
 
       res.status(201).json({ message: result });
     } catch (error) {
+      next(error);
+    }
+  }
+
+  //reply and sign
+  static async changeMessage(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { docName, email, message, privateKey } = req.body;
+      console.log(req.file);
+      console.log(req.body);
+
+      const { publicKey } = await User.findOne({
+        where: {
+          id: req.user.id,
+        },
+      });
+
+      const isValidPrivateKey = await verifyPrivateKey(privateKey, publicKey);
+
+      if (!isValidPrivateKey) {
+        throw { name: 'InvalidPrivateKey' };
+      }
+
+      const date = new Date();
+      const metaTitle = docName + '-' + date.toLocaleString('id-ID');
+      await editMetaTitle(docName, req.file.path, metaTitle);
+      const digitalSignature = signPdf(privateKey, req.file.path);
+
+      const result = await sequelize.transaction(async (t) => {
+        await Message.update(
+          {
+            message,
+            status: 'completed',
+          },
+          {
+            where: { id },
+          },
+          {
+            transaction: t,
+          }
+        );
+
+        await Document.create(
+          {
+            documentName: docName,
+            metaTitle,
+            documentPath: req.file.path,
+            digitalSignature,
+            UserId: req.user.id,
+            MessageId: id,
+          },
+          { transaction: t }
+        );
+      });
+
+      res.status(200).json({ message: 'Document signed' });
+    } catch (error) {
+      console.log(error);
       next(error);
     }
   }
@@ -246,7 +305,18 @@ class Controller {
 
       let messageSender = await Message.findAll({
         where: { UserIdSender: id },
-        include: { model: Document },
+        include: [
+          {
+            model: User,
+            as: 'Receiver',
+            include: {
+              model: Company,
+            },
+          },
+          {
+            model: Document,
+          },
+        ],
       });
       let message = { messageReceiver, messageSender };
       res.status(200).json(message);
@@ -260,9 +330,22 @@ class Controller {
     try {
       let { id } = req.params;
       let data = await Message.findByPk(id, {
-        include: {
-          model: Document,
-        },
+        include: [
+          {
+            model: Document,
+            include: {
+              model: User,
+            },
+          },
+          {
+            model: User,
+            as: 'Receiver',
+          },
+          {
+            model: User,
+            as: 'Sender',
+          },
+        ],
       });
       let UserSender = await User.findByPk(data.UserIdSender, {
         attributes: { exclude: ['password'] },
@@ -274,31 +357,31 @@ class Controller {
     }
   }
 
-  static async changeMessage(req, res, next) {
-    try {
-      let { id } = req.params;
-      let SenderEmail = req.user.name;
-      let messageUpdate = req.body.message;
-      let findMessage = await Message.findByPk(id);
-      if (!findMessage) {
-        throw { name: 'NotFoundMessage' };
-      }
-      await Message.update(
-        {
-          message: `${findMessage.message}, ${messageUpdate}`,
-          status: 'SendBack',
-        },
-        { where: { id: findMessage.id } }
-      );
-      await Notification.create({
-        message: `You Have new message from ${SenderEmail}`,
-        UserId: findMessage.UserIdSender,
-      });
-      res.status(201).json({ message: 'success sent message' });
-    } catch (error) {
-      next(error);
-    }
-  }
+  //   static async changeMessage(req, res, next) {
+  //     try {
+  //       let { id } = req.params;
+  //       let SenderEmail = req.user.name;
+  //       let messageUpdate = req.body.message;
+  //       let findMessage = await Message.findByPk(id);
+  //       if (!findMessage) {
+  //         throw { name: 'NotFoundMessage' };
+  //       }
+  //       await Message.update(
+  //         {
+  //           message: `${findMessage.message}, ${messageUpdate}`,
+  //           status: 'SendBack',
+  //         },
+  //         { where: { id: findMessage.id } }
+  //       );
+  //       await Notification.create({
+  //         message: `You Have new message from ${SenderEmail}`,
+  //         UserId: findMessage.UserIdSender,
+  //       });
+  //       res.status(201).json({ message: 'success sent message' });
+  //     } catch (error) {
+  //       next(error);
+  //     }
+  //   }
 }
 
 module.exports = Controller;

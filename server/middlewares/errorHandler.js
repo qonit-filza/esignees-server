@@ -49,6 +49,9 @@ const errorHandler = (error, req, res, next) => {
   } else if (error.name === 'NotFoundContact') {
     status = 404;
     message = 'Friend not found on your contact';
+  } else if (error.name === 'InvalidDocumentOrSignature') {
+    status = 400;
+    message = 'Invalid document or signature';
   }
 
   return res.status(status).json({ message });

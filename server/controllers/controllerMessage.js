@@ -10,7 +10,7 @@ const { signPdf, verifyPdf, verifyPrivateKey } = require('../helpers/crypto');
 const exiftool = require('node-exiftool');
 const exiftoolBin = require('dist-exiftool');
 const ep = new exiftool.ExiftoolProcess(exiftoolBin);
-const editMetaTitle = require('../helpers/exiftool');
+const { editMetaTitle } = require('../helpers/exiftool');
 
 class Controller {
   // SEND MESSAGE
@@ -115,25 +115,7 @@ class Controller {
       //write metadata
       const date = new Date();
       const metaTitle = docName + '-' + date.toLocaleString('id-ID');
-
-      ep.open()
-        // read and write metadata operations
-        .then(() => {
-          return ep.writeMetadata(
-            req.file.path,
-            {
-              all: '', // remove existing tags
-              comment: 'Exiftool rules!',
-              title: metaTitle,
-            },
-            ['overwrite_original']
-          );
-        })
-        .then(console.log, console.error)
-        //
-        .then(() => ep.close())
-        .then(() => console.log('Closed exiftool'))
-        .catch(console.error);
+      await editMetaTitle(req.file.path, metaTitle);
 
       const sender = await User.findOne({
         where: {
@@ -221,7 +203,7 @@ class Controller {
 
       const date = new Date();
       const metaTitle = docName + '-' + date.toLocaleString('id-ID');
-      await editMetaTitle(docName, req.file.path, metaTitle);
+      await editMetaTitle(req.file.path, metaTitle);
       const digitalSignature = signPdf(privateKey, req.file.path);
 
       const result = await sequelize.transaction(async (t) => {

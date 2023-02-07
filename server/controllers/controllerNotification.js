@@ -17,8 +17,6 @@ class Controller {
     try {
       let { id } = req.params;
       let data = await Notification.findByPk(id);
-      if (!data) {
-      }
       res.status(200).json(data);
     } catch (error) {
       next(error);

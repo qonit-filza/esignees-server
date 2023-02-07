@@ -6,39 +6,43 @@ const { createToken } = require("../helpers/jwt");
 let invite = "";
 
 beforeAll(async () => {
-  const company1 = await Company.create({
-    nameCompany: "Test Company",
-    legalName: "Test Company LLC",
-    address: "ABC Street",
-    phoneCompany: "12345",
-    emailCompany: "company@mail.com",
-    industry: "Test",
-    companySize: "100",
-    balance: 5,
-  });
-  invite = company1.companyInviteCode;
+  try {
+    const company1 = await Company.create({
+      nameCompany: "Test Company",
+      legalName: "Test Company LLC",
+      address: "ABC Street",
+      phoneCompany: "12345",
+      emailCompany: "company@mail.com",
+      industry: "Test",
+      companySize: "100",
+      balance: 5,
+    });
+    invite = company1.companyInviteCode;
 
-  const user1 = await User.create({
-    name: "Owner",
-    role: "Admin",
-    email: "owner@mail.com",
-    phone: "12345",
-    password: "password",
-    jobTitle: "testJob",
-    ktpId: "12345",
-    ktpImage: "12345.png",
-    status: "Verified",
-    CompanyId: 1,
-  });
+    const user1 = await User.create({
+      name: "Owner",
+      role: "Admin",
+      email: "owner@mail.com",
+      phone: "12345",
+      password: "password",
+      jobTitle: "testJob",
+      ktpId: "12345",
+      ktpImage: "12345.png",
+      status: "Verified",
+      CompanyId: company1.id,
+    });
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 afterAll(async () => {
-  await User.destroy({
+  await Company.destroy({
     truncate: true,
     cascade: true,
     restartIdentity: true,
   });
-  await Company.destroy({
+  await User.destroy({
     truncate: true,
     cascade: true,
     restartIdentity: true,
@@ -96,9 +100,9 @@ describe("POST -- Register new User & Company", () => {
     expect(response.statusCode).toBe(400);
     // expect(Array.isArray(response.body)).toBe(true);
     // expect(response.body.length).toBeGreaterThan(0);
-    expect(response.body.message).toEqual([
-      "email company address already in use!",
-    ]);
+    expect(response.body.message).toEqual(
+      "email company address already in use!"
+    );
   });
 
   test("400 -- User email already registered", async () => {
@@ -124,7 +128,7 @@ describe("POST -- Register new User & Company", () => {
     expect(response.statusCode).toBe(400);
     // expect(Array.isArray(response.body)).toBe(true);
     // expect(response.body.length).toBeGreaterThan(0);
-    expect(response.body.message).toEqual(["Email address already in use!"]);
+    expect(response.body.message).toEqual("Email address already in use!");
   });
 
   test("400 -- Sequelize Validation Error (Company)", async () => {
@@ -149,8 +153,7 @@ describe("POST -- Register new User & Company", () => {
 
     // console.log(response.body.message, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
     expect(response.statusCode).toBe(400);
-    expect(Array.isArray(response.body.message)).toBe(true);
-    expect(response.body.message.length).toEqual(6);
+    expect(response.body.message).toBe("company name is required");
   });
 
   test("400 -- Sequelize Validation Error (User) // No invite code", async () => {
@@ -175,11 +178,10 @@ describe("POST -- Register new User & Company", () => {
 
     // console.log(response.body.message, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
     expect(response.statusCode).toBe(400);
-    expect(Array.isArray(response.body.message)).toBe(true);
-    expect(response.body.message.length).toEqual(8);
+    expect(response.body.message).toBe("name is required");
   });
 
-  test("should return 201 status code and create new User -- With invite code", async () => {
+  test("201 -- Create new User // With invite code", async () => {
     const response = await request(app).post("/register").send({
       // COMPANY DATA
       companyInviteCode: invite,
@@ -213,13 +215,11 @@ describe("POST -- Register new User & Company", () => {
       ktpImage: "",
     });
 
-    // console.log(response.body.message, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
     expect(response.statusCode).toBe(400);
-    expect(Array.isArray(response.body.message)).toBe(true);
-    expect(response.body.message.length).toEqual(8);
+    expect(response.body.message).toBe("name is required");
   });
 
-  test("should return 404 status code; Company not found", async () => {
+  test("404 -- Company not found", async () => {
     const response = await request(app).post("/register").send({
       // COMPANY DATA
       companyInviteCode: "invite",
@@ -312,7 +312,7 @@ describe("GET -- Profile Detail", () => {
 
     expect(response.statusCode).toBe(401);
     expect(response.body).toEqual(expect.any(Object));
-    expect(response.body.message).toEqual("Login First");
+    expect(response.body.message).toEqual("Unauthenticated");
   });
 });
 
@@ -349,8 +349,9 @@ describe("PUT -- Profile Detail", () => {
       .set("access_token", access_token);
 
     expect(response.statusCode).toBe(400);
-    expect(Array.isArray(response.body.message)).toBe(true);
-    expect(response.body.message.length).toEqual(5);
+    expect(response.body.message).toBe("name is required");
+    // expect(Array.isArray(response.body.message)).toBe(true);
+    // expect(response.body.message.length).toEqual(5);
   });
 
   test("401 -- Unauthorized", async () => {
@@ -367,6 +368,6 @@ describe("PUT -- Profile Detail", () => {
 
     expect(response.statusCode).toBe(401);
     expect(response.body).toEqual(expect.any(Object));
-    expect(response.body.message).toEqual("Login First");
+    expect(response.body.message).toEqual("Unauthenticated");
   });
 });

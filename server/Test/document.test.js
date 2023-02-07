@@ -1,20 +1,46 @@
 const request = require("supertest");
 const app = require("../app");
-const { User, Message, Document } = require("../models");
+const { User, Message, Document, Company } = require("../models");
 const { createToken } = require("../helpers/jwt");
 
 let token = "";
+let token2 = "";
 beforeAll(async () => {
+  const company1 = await Company.create({
+    nameCompany: "Test Company",
+    legalName: "Test Company LLC",
+    address: "ABC Street",
+    phoneCompany: "12345",
+    emailCompany: "company@mail.com",
+    industry: "Test",
+    companySize: "100",
+    balance: 5,
+  });
+  invite = company1.companyInviteCode;
+
   const user1 = await User.create({
-    name: "Test",
-    email: "test@mail.com",
+    name: "Owner",
+    role: "Admin",
+    email: "owner@mail.com",
     phone: "12345",
     password: "password",
     jobTitle: "testJob",
     ktpId: "12345",
     ktpImage: "12345.png",
+    status: "Verified",
+    CompanyId: 1,
   });
-  token = createToken({ id: user1.id, email: user1.email });
+
+  token = createToken({
+    id: user1.id,
+    name: user1.name,
+    idCompany: user1.CompanyId,
+  });
+  token2 = createToken({
+    id: 999,
+    name: "aaa",
+    idCompany: 1,
+  });
 
   const user2 = await User.create({
     name: "Friend",
@@ -44,6 +70,11 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  await Company.destroy({
+    truncate: true,
+    cascade: true,
+    restartIdentity: true,
+  });
   await User.destroy({
     truncate: true,
     cascade: true,
@@ -68,6 +99,13 @@ describe("GET Document", () => {
       .set("access_token", token);
 
     expect(response.statusCode).toEqual(200);
+  });
+  test("401 -- Unauthorized", async () => {
+    const response = await request(app)
+      .get("/documents/1")
+      .set("access_token", token2);
+
+    expect(response.statusCode).toEqual(401);
   });
   test("404 -- No Document found with that ID", async () => {
     const response = await request(app)

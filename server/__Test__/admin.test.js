@@ -21,7 +21,7 @@ beforeAll(async () => {
       id: data.id,
       email: data.email,
     });
-    userId = data.id
+    userId = data.id;
     invalidToken =
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OCwiZW1haWwiOiJhZG1pbjRAbWFpbC5jb20iLCJpYXQiOjE2NzU2NzA5NTR9.Z_kzg2Bx3jh8OK90oVQC2JNlGdM-LQ0tUymc98saxGA";
     await queryInterface.bulkInsert(
@@ -62,9 +62,21 @@ beforeAll(async () => {
 
 afterAll(async () => {
   try {
-    await Admin.destroy({ truncate: true, cascade: true, restartIdentity: true });
-    await Company.destroy({truncate: true, cascade: true, restartIdentity: true})
-    await User.destroy({ truncate: true, cascade: true, restartIdentity: true });
+    await Admin.destroy({
+      truncate: true,
+      cascade: true,
+      restartIdentity: true,
+    });
+    await Company.destroy({
+      truncate: true,
+      cascade: true,
+      restartIdentity: true,
+    });
+    await User.destroy({
+      truncate: true,
+      cascade: true,
+      restartIdentity: true,
+    });
   } catch (error) {
     console.log(error, "afterAll");
   }
@@ -195,63 +207,64 @@ describe("admin routes test", () => {
 
   describe("GET data user", () => {
     test("200 success get data user", async () => {
-      const response = await request(app).get("/adm/users")
-      .set("access_token", validToken)
-      expect(response.status).toBe(200)
-      expect(Array.isArray(response.body)).toBeTruthy()
+      const response = await request(app)
+        .get("/adm/users")
+        .set("access_token", validToken);
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body)).toBeTruthy();
     });
 
-    test("401 get data user with invalid token", async () =>{
-      const response = await request(app).get("/adm/users")
-      .set("access_token", invalidToken)
-      expect(response.status).toBe(401)
+    test("401 get data user with invalid token", async () => {
+      const response = await request(app)
+        .get("/adm/users")
+        .set("access_token", invalidToken);
+      expect(response.status).toBe(401);
       expect(response.body).toBeInstanceOf(Object);
-      expect(response.body).toHaveProperty("message", "Unauthenticated")
+      expect(response.body).toHaveProperty("message", "Login First");
     });
 
-    test("401 get data user without token", async () =>{
-      const response = await request(app).get("/adm/users")
-      expect(response.status).toBe(401)
+    test("401 get data user without token", async () => {
+      const response = await request(app).get("/adm/users");
+      expect(response.status).toBe(401);
       expect(response.body).toBeInstanceOf(Object);
-      expect(response.body).toHaveProperty("message", "Unauthenticated")
+      expect(response.body).toHaveProperty("message", "Login First");
     });
-  })
-  
+  });
+
   describe("PATCH status on user", () => {
-
-    
-    test('401 update status without access token', async () => {
+    test("401 update status without access token", async () => {
       // console.log(userId, "userId");
-      const response = await request(app).patch(`/adm/users/${userId}`)
-      expect(response.status).toBe(401)
+      const response = await request(app).patch(`/adm/users/${userId}`);
+      expect(response.status).toBe(401);
       expect(response.body).toBeInstanceOf(Object);
-      expect(response.body).toHaveProperty("message", "Unauthenticated")
-    })
+      expect(response.body).toHaveProperty("message", "Login First");
+    });
 
-    test('401 update status with invalid token', async () => {
+    test("401 update status with invalid token", async () => {
       // console.log(userId, "userId");
-      const response = await request(app).patch(`/adm/users/${userId}`)
-      .set("access_token", invalidToken)
-      expect(response.status).toBe(401)
+      const response = await request(app)
+        .patch(`/adm/users/${userId}`)
+        .set("access_token", invalidToken);
+      expect(response.status).toBe(401);
       expect(response.body).toBeInstanceOf(Object);
-      expect(response.body).toHaveProperty("message", "Unauthenticated")
-    })
-  })
+      expect(response.body).toHaveProperty("message", "Login First");
+    });
+  });
 
   describe("DELETE user", () => {
-    test('401 delete user without token', async () => {
-      const response = await request(app).delete(`/adm/users/1`)
-      expect(response.status).toBe(401)
+    test("401 delete user without token", async () => {
+      const response = await request(app).delete(`/adm/users/1`);
+      expect(response.status).toBe(401);
       expect(response.body).toBeInstanceOf(Object);
-      expect(response.body).toHaveProperty("message", "Unauthenticated")
-    })
-    test('401 delete user with invalid token', async () => {
-      const response = await request(app).delete(`/adm/users/1`)
-      .set("access_token", invalidToken)
-      expect(response.status).toBe(401)
+      expect(response.body).toHaveProperty("message", "Login First");
+    });
+    test("401 delete user with invalid token", async () => {
+      const response = await request(app)
+        .delete(`/adm/users/1`)
+        .set("access_token", invalidToken);
+      expect(response.status).toBe(401);
       expect(response.body).toBeInstanceOf(Object);
-      expect(response.body).toHaveProperty("message", "Unauthenticated")
-    })
-
-  })
+      expect(response.body).toHaveProperty("message", "Login First");
+    });
+  });
 });

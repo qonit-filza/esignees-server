@@ -1,6 +1,8 @@
 const { User, Company, sequelize } = require('../models/index');
 const { createToken, decodedToken } = require('../helpers/jwt');
 const { comparePassword, hashPassword } = require('../helpers/bcrypt');
+const { generateKeyPair } = require('../helpers/crypto');
+
 
 class Controller {
   // REGISTER COMPANY AND USER OR USER ONLY
@@ -161,6 +163,8 @@ class Controller {
       next(error);
     }
   }
+
+
 }
 
 module.exports = Controller;

@@ -42,6 +42,12 @@ const errorHandler = (error, req, res, next) => {
   } else if (error.name === 'NotFoundMessage') {
     status = 404;
     message = 'Message not found';
+  } else if (error.name === 'Free') {
+    status = 401;
+    message = 'You Must Subscribe first';
+  } else if (error.name === 'UnauthorizedAdmin') {
+    status = 401;
+    message = 'Login First';
   } else if (error.name === 'NotFoundContact') {
     status = 404;
     message = 'Friend not found on your contact';

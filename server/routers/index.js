@@ -13,6 +13,9 @@ router.use(authetication);
 const contact = require('./contact');
 router.use('/contacts', contact);
 
+const company = require('./company');
+router.use('/companies', company);
+
 const message = require('./message');
 router.use('/sents', message);
 

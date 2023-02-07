@@ -8,9 +8,7 @@ const errorHandler = (error, req, res, next) => {
     error.name === 'SequelizeUniqueConstraintError'
   ) {
     status = 400;
-    message = error.errors.map((item) => {
-      return item.message;
-    });
+    message = error.errors[0].message;
   } else if (error.name === 'BadRequest') {
     status = 400;
     message = 'Email or Password is required';
@@ -22,7 +20,7 @@ const errorHandler = (error, req, res, next) => {
     error.name === 'JsonWebTokenError'
   ) {
     status = 401;
-    message = 'Login First';
+    message = 'Unauthenticated';
   } else if (error.name === 'InvalidCredentials') {
     status = 401;
     message = 'Invalid Email or Password';
@@ -42,6 +40,12 @@ const errorHandler = (error, req, res, next) => {
   } else if (error.name === 'NotFoundMessage') {
     status = 404;
     message = 'Message not found';
+  } else if (error.name === 'Free') {
+    status = 401;
+    message = 'You Must Subscribe first';
+  } else if (error.name === 'UnauthorizedAdmin') {
+    status = 401;
+    message = 'Login First';
   } else if (error.name === 'NotFoundContact') {
     status = 404;
     message = 'Friend not found on your contact';

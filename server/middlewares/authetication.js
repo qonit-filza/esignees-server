@@ -9,12 +9,14 @@ async function authetication(req, res, next) {
     }
 
     let payload = decodedToken(access_token);
-    let dataUser = await User.findByPk(payload.id);
+    let dataUser = await User.findByPk(payload.id, {
+      include : ['Company']
+    });
     if (!dataUser) {
       throw { name: "Unauthorized" };
     }
 
-    req.user = { id: dataUser.id, name:dataUser.email };
+    req.user = { id: dataUser.id, name:dataUser.email, idCompany:dataUser.Company.id };
     next();
   } catch (error) {
     next(error);

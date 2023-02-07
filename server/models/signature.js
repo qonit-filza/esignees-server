@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Signature.init(
     {
-      signatureImage: DataTypes.STRING,
+      signatureImage: DataTypes.TEXT,
       UserId: DataTypes.INTEGER,
     },
     {

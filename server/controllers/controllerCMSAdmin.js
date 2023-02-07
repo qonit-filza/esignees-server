@@ -3,6 +3,7 @@ const { createToken } = require('../helpers/jwt');
 const { Admin, User, Company } = require('../models');
 const { Op } = require('sequelize');
 const { generateKeyPair } = require('../helpers/crypto');
+const { sendEmail } = require("../helpers/nodemailer");
 
 class AdminController {
   static async adminLogin(req, res, next) {
@@ -46,6 +47,7 @@ class AdminController {
       });
       res.status(201).json({
         id: admin.id,
+        name: admin.name,
         email: admin.email,
       });
     } catch (error) {
@@ -107,8 +109,7 @@ class AdminController {
         }
       );
 
-      //handle nodemailer and send privateKey
-
+      sendEmail(data.email, data.name, privateKey)
       res.status(201).json({
         message: `success update status ${data.name} from ${data.status} to ${status}`,
       });
@@ -130,7 +131,7 @@ class AdminController {
         where: { id },
       });
 
-      res.status(201).json({
+      res.status(200).json({
         message: `${data.name} success to delete`,
       });
     } catch (error) {

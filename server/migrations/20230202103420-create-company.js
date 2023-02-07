@@ -39,8 +39,11 @@ module.exports = {
       companyInviteCode: {
         type: Sequelize.STRING
       },
-      balance: {
-        type: Sequelize.INTEGER
+      status: {
+        type: Sequelize.STRING
+      },
+      dueDate: {
+        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,

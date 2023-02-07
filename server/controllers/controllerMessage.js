@@ -258,6 +258,27 @@ class Controller {
     }
   }
 
+  static async rejectMessage(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { message } = req.body;
+
+      await Message.update(
+        {
+          message,
+          status: 'rejected',
+        },
+        {
+          where: { id },
+        }
+      );
+      res.status(200).json({ message: `You've rejected sign request` });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
+
   //previous
   //   static async sendMessage2(req, res, next) {
   //     try {

@@ -17,5 +17,6 @@ router.post('/', upload.single('file'), ControllerMessage.sendMessage);
 router.get('/', ControllerMessage.showAllMessage);
 router.get('/:id', ControllerMessage.readMessage);
 router.put('/:id', upload.single('file'), ControllerMessage.changeMessage);
+router.put('/:id/reject', ControllerMessage.rejectMessage);
 
 module.exports = router;

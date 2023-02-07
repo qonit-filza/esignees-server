@@ -51,7 +51,7 @@ class Controller {
       let id = req.user.idCompany
       const newDate = new Date()
       let data = await Company.update({
-          dueDate : newDate.setDate(newDate.getDate() - 30),
+          dueDate : newDate.setDate(newDate.getDate() + 30),
           status : "Subscription"
         }, {where : {id}})
       res.status(201).json({message : `Congrats, your subscription was successfully!`})

@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-function sendEmail(email, name) {
+function sendEmail(email, name, privateKey) {
   let transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -117,7 +117,7 @@ function sendEmail(email, name) {
                                                                                 </tr>
                                                                                 <tr>
                                                                                     <td align="center" class="esd-block-text es-m-txt-l es-p15t es-p15b es-p25l" bgcolor="#efefef">
-                                                                                        <p style="font-family: tahoma, verdana, segoe, sans-serif; line-height: 150%;"><strong><span style="color: #000000;">Your Private-Key :&nbsp;</span></strong><br><span style="color: #000000;">ewdawdwadawdwdwadwad</span></p>
+                                                                                        <p style="font-family: tahoma, verdana, segoe, sans-serif; line-height: 150%;"><strong><span style="color: #000000;">Your Private-Key :&nbsp;</span></strong><br><span style="color: #000000;">${privateKey}</span></p>
                                                                                     </td>
                                                                                 </tr>
                                                                             </tbody>

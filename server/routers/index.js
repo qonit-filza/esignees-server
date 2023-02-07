@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-// const { authetication } = require('../middlewares/authetication');
+const { authetication } = require('../middlewares/authetication');
 
 const user = require('./user');
 router.use('/', user);
@@ -8,7 +8,7 @@ router.use('/', user);
 const admin = require('./admin');
 router.use('/adm', admin);
 
-// router.use(authetication);
+router.use(authetication);
 
 const contact = require('./contact');
 router.use('/contacts', contact);

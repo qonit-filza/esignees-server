@@ -206,14 +206,14 @@ describe("admin routes test", () => {
       .set("access_token", invalidToken)
       expect(response.status).toBe(401)
       expect(response.body).toBeInstanceOf(Object);
-      expect(response.body).toHaveProperty("message", "Unauthenticated")
+      expect(response.body).toHaveProperty("message", "Login First")
     });
 
     test("401 get data user without token", async () =>{
       const response = await request(app).get("/adm/users")
       expect(response.status).toBe(401)
       expect(response.body).toBeInstanceOf(Object);
-      expect(response.body).toHaveProperty("message", "Unauthenticated")
+      expect(response.body).toHaveProperty("message", "Login First")
     });
   })
   
@@ -225,7 +225,7 @@ describe("admin routes test", () => {
       const response = await request(app).patch(`/adm/users/${userId}`)
       expect(response.status).toBe(401)
       expect(response.body).toBeInstanceOf(Object);
-      expect(response.body).toHaveProperty("message", "Unauthenticated")
+      expect(response.body).toHaveProperty("message", "Login First")
     })
 
     test('401 update status with invalid token', async () => {
@@ -234,7 +234,7 @@ describe("admin routes test", () => {
       .set("access_token", invalidToken)
       expect(response.status).toBe(401)
       expect(response.body).toBeInstanceOf(Object);
-      expect(response.body).toHaveProperty("message", "Unauthenticated")
+      expect(response.body).toHaveProperty("message", "Login First")
     })
   })
 
@@ -243,14 +243,14 @@ describe("admin routes test", () => {
       const response = await request(app).delete(`/adm/users/1`)
       expect(response.status).toBe(401)
       expect(response.body).toBeInstanceOf(Object);
-      expect(response.body).toHaveProperty("message", "Unauthenticated")
+      expect(response.body).toHaveProperty("message", "Login First")
     })
     test('401 delete user with invalid token', async () => {
       const response = await request(app).delete(`/adm/users/1`)
       .set("access_token", invalidToken)
       expect(response.status).toBe(401)
       expect(response.body).toBeInstanceOf(Object);
-      expect(response.body).toHaveProperty("message", "Unauthenticated")
+      expect(response.body).toHaveProperty("message", "Login First")
     })
 
   })

@@ -34,9 +34,10 @@ beforeAll(async () => {
   });
 
   const doc = await Document.create({
-    metaTitle: "Test_Doc",
+    documentName: "TestPDF",
+    metaTitle: "PDF123_Test",
     documentPath: "https://picsum.photos/200",
-    digitalSignature: "abc.png",
+    digitalSignature: "",
     MessageId: 1,
     UserId: 1,
   });
@@ -61,11 +62,25 @@ afterAll(async () => {
 });
 
 describe("GET Document", () => {
-  test("200 -- Returns Document requested based on ID", async () => {
+  test("200 -- ONE", async () => {
     const response = await request(app)
       .get("/documents/1")
       .set("access_token", token);
 
-    console.log("><><>><><><><><><<><><><", response.body);
+    expect(response.statusCode).toEqual(200);
+  });
+  test("404 -- No Document found with that ID", async () => {
+    const response = await request(app)
+      .get("/documents/999")
+      .set("access_token", token);
+
+    expect(response.statusCode).toEqual(404);
+  });
+  test("500 -- OTHER", async () => {
+    const response = await request(app)
+      .get("/documents/1")
+      .set("access_token", token);
+
+    expect(response.statusCode).toEqual(500);
   });
 });

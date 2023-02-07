@@ -46,10 +46,10 @@ class Controller {
         throw { name: "NotFoundContact" };
       }
       let user = await User.findByPk(find.UserIdContact);
-      if (user.id == userId) {
-        let data = await User.findByPk(find.UserIdOwner);
-        return res.status(200).json(data);
-      }
+      // if (user.id == userId) {
+      //   let data = await User.findByPk(find.UserIdOwner);
+      //   return res.status(200).json(data);
+      // }
       res.status(200).json(user);
     } catch (error) {
       next(error);

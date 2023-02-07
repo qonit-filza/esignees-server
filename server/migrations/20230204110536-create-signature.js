@@ -10,7 +10,7 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       signatureImage: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
       },
       UserId: {
         type: Sequelize.INTEGER,

@@ -203,7 +203,7 @@ describe("admin routes test", () => {
 
     test("401 get data user with invalid token", async () =>{
       const response = await request(app).get("/adm/users")
-      .set("acccess_token", invalidToken)
+      .set("access_token", invalidToken)
       expect(response.status).toBe(401)
       expect(response.body).toBeInstanceOf(Object);
       expect(response.body).toHaveProperty("message", "Unauthenticated")
@@ -219,6 +219,7 @@ describe("admin routes test", () => {
   
   describe("PATCH status on user", () => {
 
+    
     test('401 update status without access token', async () => {
       // console.log(userId, "userId");
       const response = await request(app).patch(`/adm/users/${userId}`)
@@ -230,7 +231,7 @@ describe("admin routes test", () => {
     test('401 update status with invalid token', async () => {
       // console.log(userId, "userId");
       const response = await request(app).patch(`/adm/users/${userId}`)
-      .set("acccess_token", invalidToken)
+      .set("access_token", invalidToken)
       expect(response.status).toBe(401)
       expect(response.body).toBeInstanceOf(Object);
       expect(response.body).toHaveProperty("message", "Unauthenticated")
@@ -246,7 +247,7 @@ describe("admin routes test", () => {
     })
     test('401 delete user with invalid token', async () => {
       const response = await request(app).delete(`/adm/users/1`)
-      .set("acccess_token", invalidToken)
+      .set("access_token", invalidToken)
       expect(response.status).toBe(401)
       expect(response.body).toBeInstanceOf(Object);
       expect(response.body).toHaveProperty("message", "Unauthenticated")

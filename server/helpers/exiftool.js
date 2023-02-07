@@ -2,7 +2,7 @@ const exiftool = require('node-exiftool');
 const exiftoolBin = require('dist-exiftool');
 const ep = new exiftool.ExiftoolProcess(exiftoolBin);
 
-const editMetaTitle = async (docName, filePath, newMetaTitle) => {
+const editMetaTitle = async (filePath, newMetaTitle) => {
   try {
     await ep.open();
     const write = await ep.writeMetadata(
@@ -17,10 +17,25 @@ const editMetaTitle = async (docName, filePath, newMetaTitle) => {
 
     console.log(write);
     await ep.close();
-    console.log('Closing exif tool');
+    console.log('Closed exif tool');
   } catch (error) {
     console.log(error);
+    next(error);
   }
 };
 
-module.exports = editMetaTitle;
+const readMetaData = async (filePath) => {
+  try {
+    await ep.open();
+    const metaData = await ep.readMetadata(filePath, ['-File:all']);
+    await ep.close();
+    console.log('Closed exif tool');
+
+    return metaData.data[0];
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+module.exports = { editMetaTitle, readMetaData };

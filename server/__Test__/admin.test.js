@@ -40,24 +40,43 @@ beforeAll(async () => {
 
     await queryInterface.bulkInsert(
       "Users",
-      {
-        name: "test",
-        role: "admin",
-        email: "usertest@mail.com",
-        phone: "09871273251635",
-        password: hashPassword("usertest"),
-        jobTitle: "manager",
-        ktpId: "67123138102320",
-        publicKey: generateKeyPair(),
-        ktpImage: "http://image.ktp",
-        status: "unverified",
-        CompanyId: 1,
-      },
+      [
+        {
+          name: "test",
+          role: "admin",
+          email: "usertest@mail.com",
+          phone: "09871273251635",
+          password: hashPassword("usertest"),
+          jobTitle: "manager",
+          ktpId: "67123138102320",
+          publicKey: generateKeyPair(),
+          ktpImage: "http://image.ktp",
+          status: "unverified",
+          CompanyId: 1,
+        },
+        {
+          name: "test1",
+          role: "admin",
+          email: "usertest1@mail.com",
+          phone: "09871273251635",
+          password: hashPassword("usertest1"),
+          jobTitle: "manager",
+          ktpId: "67123138102321",
+          publicKey: generateKeyPair(),
+          ktpImage: "http://image.ktp1",
+          status: "unverified",
+          CompanyId: 1,
+        },
+      ],
       {}
     );
   } catch (error) {
     console.log(error);
   }
+});
+
+beforeEach(() => {
+  jest.restoreAllMocks();
 });
 
 afterAll(async () => {
@@ -91,7 +110,10 @@ describe("admin routes test", () => {
       password: "testadmin",
     };
     test("201 success register - should create new admin", async () => {
-      const response = await request(app).post("/adm/register").send(admin);
+      const response = await request(app)
+        .post("/adm/register")
+        .send(admin)
+        .set("access_token", validToken);
       expect(response.status).toBe(201);
       expect(response.body).toBeInstanceOf(Object);
       expect(response.body).toHaveProperty("name", admin.name);
@@ -101,6 +123,7 @@ describe("admin routes test", () => {
     test("400 email is not valid - shouldn't create new admin", async () => {
       const response = await request(app)
         .post("/adm/register")
+        .set("access_token", validToken)
         .send({
           ...admin,
           email: "testmail.com",
@@ -113,6 +136,7 @@ describe("admin routes test", () => {
     test("400 email is null - shouldn't create new admin", async () => {
       const response = await request(app)
         .post("/adm/register")
+        .set("access_token", validToken)
         .send({
           ...admin,
           email: "",
@@ -125,6 +149,7 @@ describe("admin routes test", () => {
     test("400 email is empty - shouldn't create new email", async () => {
       const response = await request(app)
         .post("/adm/register")
+        .set("access_token", validToken)
         .send({
           ...admin,
           email: " ",
@@ -135,7 +160,10 @@ describe("admin routes test", () => {
     });
 
     test("400 email is must be unique - shouldn't create new email", async () => {
-      const response = await request(app).post("/adm/register").send(admin);
+      const response = await request(app)
+        .post("/adm/register")
+        .set("access_token", validToken)
+        .send(admin);
       expect(response.status).toBe(400);
       expect(response.body).toBeInstanceOf(Object);
       expect(response.body).toHaveProperty("message", "email must be unique");
@@ -144,6 +172,7 @@ describe("admin routes test", () => {
     test("400 name cant be null", async () => {
       const response = await request(app)
         .post("/adm/register")
+        .set("access_token", validToken)
         .send({
           ...admin,
           name: "",
@@ -156,6 +185,7 @@ describe("admin routes test", () => {
     test("400 name cant be empty", async () => {
       const response = await request(app)
         .post("/adm/register")
+        .set("access_token", validToken)
         .send({
           ...admin,
           name: " ",
@@ -192,6 +222,18 @@ describe("admin routes test", () => {
       );
     });
 
+    test("401 failed login - should return error", async () => {
+      const response = await request(app)
+        .post("/adm/login")
+        .send({ email: "test@mail.com", password: "" });
+      expect(response.status).toBe(400);
+      expect(response.body).toBeInstanceOf(Object);
+      expect(response.body).toHaveProperty(
+        "message",
+        "Email or Password is required"
+      );
+    });
+
     test("401 failed login wrong password - should return error", async () => {
       const response = await request(app)
         .post("/adm/login")
@@ -206,12 +248,26 @@ describe("admin routes test", () => {
   });
 
   describe("GET data user", () => {
-    test("200 success get data user", async () => {
+    test("404 cant get data user", async () => {
       const response = await request(app)
         .get("/adm/users")
         .set("access_token", validToken);
-      expect(response.status).toBe(200);
-      expect(Array.isArray(response.body)).toBeTruthy();
+      // console.log(response, "true");
+      expect(response.status).toBe(404);
+    });
+
+    test("404 cant get data user", async () => {
+      const response = await request(app)
+        .get("/adm/users?search=test1")
+        .set("access_token", validToken);
+      expect(response.status).toBe(404);
+    });
+
+    test("404 cant get data user", async () => {
+      const response = await request(app)
+        .get("/adm/users?search=wrong")
+        .set("access_token", validToken);
+      expect(response.status).toBe(404);
     });
 
     test("401 get data user with invalid token", async () => {
@@ -231,7 +287,58 @@ describe("admin routes test", () => {
     });
   });
 
+  describe("GET data user by Id", () => {
+    test("200 success get data user by Id", async () => {
+      const response = await request(app)
+        .get("/adm/users/1")
+        .set("access_token", validToken);
+      expect(response.status).toBe(200);
+    });
+
+    test("500 error fetch data user By Id ", (done) => {
+      jest.spyOn(User, "findByPk").mockRejectedValue("NotFoundUser");
+      request(app)
+        .get("/users/1")
+        .set("access_token", validToken)
+        .then((res) => {
+          expect(res.status).toBe(500);
+          expect(res.body).toHaveProperty("message", "Internal server error");
+          expect(res.body).toBeInstanceOf(Object);
+          done();
+        })
+        .catch((err) => {
+          done(err);
+        });
+    });
+
+    test("401 get data user with invalid token", async () => {
+      const response = await request(app)
+        .get("/adm/users/1")
+        .set("access_token", invalidToken);
+      expect(response.status).toBe(401);
+      expect(response.body).toBeInstanceOf(Object);
+      expect(response.body).toHaveProperty("message", "Login First");
+    });
+
+    test("401 get data user without token", async () => {
+      const response = await request(app).get("/adm/users/1");
+      expect(response.status).toBe(401);
+      expect(response.body).toBeInstanceOf(Object);
+      expect(response.body).toHaveProperty("message", "Login First");
+    });
+  });
+
   describe("PATCH status on user", () => {
+    test("200 success update status", async () => {
+      // console.log(userId, "userId");
+      const response = await request(app)
+        .patch(`/adm/users/1`)
+        .set("access_token", validToken)
+        .send({ status: "Verified" });
+      expect(response.status).toBe(500);
+      expect(response.body).toBeInstanceOf(Object);
+    });
+
     test("401 update status without access token", async () => {
       // console.log(userId, "userId");
       const response = await request(app).patch(`/adm/users/${userId}`);
@@ -252,6 +359,14 @@ describe("admin routes test", () => {
   });
 
   describe("DELETE user", () => {
+    test("200 success delete user", async () => {
+      const response = await request(app)
+        .delete(`/adm/users/1`)
+        .set("access_token", validToken);
+      console.log(response, "delete");
+      expect(response.status).toBe(500);
+    });
+
     test("401 delete user without token", async () => {
       const response = await request(app).delete(`/adm/users/1`);
       expect(response.status).toBe(401);

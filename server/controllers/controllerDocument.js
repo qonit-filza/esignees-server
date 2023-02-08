@@ -29,7 +29,7 @@ class Controller {
   static async verifyDocument(req, res, next) {
     try {
       const { Title } = await readMetaData(req.file.path);
-      console.log({ Title });
+      // console.log({ Title });
 
       if (!Title) {
         throw { name: 'InvalidDocumentOrSignature' };
@@ -47,7 +47,7 @@ class Controller {
         ],
       });
 
-      console.log({ document });
+      // console.log({ document });
 
       if (!document) {
         throw { name: 'InvalidDocumentOrSignature' };
@@ -89,7 +89,12 @@ class Controller {
             throw { name: 'InvalidDocumentOrSignature' };
           }
 
-          tempSignInfo.push(doc.User);
+          //change
+          tempSignInfo.push({
+            name: doc.User.name,
+            email: doc.User.email,
+            createdAt: doc.createdAt,
+          });
         }
 
         message = tempSignInfo.map((el) => {

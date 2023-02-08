@@ -6,15 +6,14 @@ async function authorizationStatus(req, res, next) {
 
     let company = await Company.findByPk(id);
 
-    if (company == "Free") {
+    if (company.status == "Free") {
       throw { name: "Free" };
     }
-    
+
     next();
   } catch (error) {
     next(error);
   }
 }
 
-
-module.exports = {authorizationStatus}
+module.exports = { authorizationStatus };

@@ -296,20 +296,20 @@ describe("admin routes test", () => {
     });
 
     test("500 error fetch data user By Id ", (done) => {
-      jest.spyOn(User, "findByPk").mockRejectedValue('NotFoundUser')
+      jest.spyOn(User, "findByPk").mockRejectedValue("NotFoundUser");
       request(app)
-      .get("/users/1")
-      .set("access_token", validToken)
-      .then((res) => {
-        expect(res.status).toBe(500)
-        expect(res.body).toHaveProperty("message", "Internal server error")
-        expect(res.body).toBeInstanceOf(Object)
-        done()
-      })
-      .catch((err) =>{
-        done(err)
-      })
-    })
+        .get("/users/1")
+        .set("access_token", validToken)
+        .then((res) => {
+          expect(res.status).toBe(500);
+          expect(res.body).toHaveProperty("message", "Internal server error");
+          expect(res.body).toBeInstanceOf(Object);
+          done();
+        })
+        .catch((err) => {
+          done(err);
+        });
+    });
 
     test("401 get data user with invalid token", async () => {
       const response = await request(app)
@@ -334,7 +334,7 @@ describe("admin routes test", () => {
       const response = await request(app)
         .patch(`/adm/users/1`)
         .set("access_token", validToken)
-        .send({status: "Verified"})
+        .send({ status: "Verified" });
       expect(response.status).toBe(500);
       expect(response.body).toBeInstanceOf(Object);
     });

@@ -1,12 +1,29 @@
 const express = require('express');
 const router = express.Router();
 const { authetication } = require('../middlewares/authetication');
+const multer = require('multer');
+const controllerDocument = require('../controllers/controllerDocument');
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, './uploads/verify');
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname + '-' + Date.now() + '.pdf');
+  },
+});
+const upload = multer({ storage: storage });
 
 const user = require('./user');
 router.use('/', user);
 
 const admin = require('./admin');
 router.use('/adm', admin);
+
+router.post(
+  '/verify-document',
+  upload.single('file'),
+  controllerDocument.verifyDocument
+);
 
 router.use(authetication);
 

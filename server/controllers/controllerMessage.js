@@ -258,8 +258,8 @@ class Controller {
           where: { id },
         }
       );
-      res.status(200).json({ message: `You've rejected sign request` });
       sendEmailRejected(findSender.email, findSender.name, req.user.username)
+      res.status(200).json({ message: `You've rejected sign request` });
     } catch (error) {
       console.log(error);
       next(error);

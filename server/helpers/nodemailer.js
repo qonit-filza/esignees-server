@@ -392,7 +392,7 @@ function sendEmailToReceiver(email, name, senderName) {
                                                                               </tr>
                                                                               <tr>
                                                                                   <td align="center" class="esd-block-text es-p30t es-m-txt-c">
-                                                                                      <h1 style="font-family: tahoma, verdana, segoe, sans-serif;"><span style="font-size: 25px;">Dear ${name},<br>You have a new signature request for ${senderName}</span><span style="font-size: 26px;">.</span></h1>
+                                                                                      <h1 style="font-family: tahoma, verdana, segoe, sans-serif;"><span style="font-size: 25px;">Dear ${name},<br>You have a new signature request from ${senderName}</span><span style="font-size: 26px;">.</span></h1>
                                                                                   </td>
                                                                               </tr>
                                                                           </tbody>

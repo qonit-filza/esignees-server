@@ -76,7 +76,12 @@ class AdminController {
       }
 
       let user = await User.findAll(paramQuerySQL);
-      res.status(200).json(user);
+      console.log(user.length);
+      if(user.length === 0) {
+        throw {name: "NotFoundUser"}
+      }
+        res.status(200).json(user);
+
     } catch (error) {
       next(error);
     }

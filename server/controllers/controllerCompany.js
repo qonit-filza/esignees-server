@@ -64,6 +64,7 @@ class Controller {
     try {
         let id = req.user.idCompany
         let data = await Company.findByPk(id)
+
         if (data.dueDate < new Date()){
             await Company.update({
                 dueDate : new Date(),

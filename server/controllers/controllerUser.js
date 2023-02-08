@@ -142,6 +142,7 @@ class Controller {
 
       res.status(200).json({
         name: user.name,
+        role: user.role,
         email: user.email,
         phone: user.phone,
         jobTitle: user.jobTitle,

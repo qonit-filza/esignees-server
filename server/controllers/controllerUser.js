@@ -140,13 +140,14 @@ class Controller {
           },
         ],
       });
+
       res.status(200).json({
         name: user.name,
         email: user.email,
         phone: user.phone,
         jobTitle: user.jobTitle,
         company: user.Company.nameCompany,
-        signature: user.Signature.signatureImage,
+        signature: user.Signature?.signatureImage,
       });
     } catch (error) {
       next(error);

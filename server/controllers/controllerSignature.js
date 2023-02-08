@@ -63,9 +63,93 @@ class Controller {
     }
   }
 
-  static async editSignature() {}
+  static async editSignature(req, res, next) {
+    try {
+      let { access_token } = req.headers;
+      let { signatureImage } = req.body;
+      let decode = decodedToken(access_token);
+      let user = await User.findByPk(decode.id);
+      if (!user) {
+        throw { name: 'NotFoundUser' };
+      }
 
-  static async deleteSignature() {}
+      const result = await cloudinary.uploader.upload(signatureImage, {
+        use_filename: true,
+        unique_filename: false,
+        overwrite: true,
+      });
+      console.log(result.url);
+
+      await Signature.update(
+        {
+          signatureImage: result.url,
+        },
+        {
+          where: {
+            UserId: user.id,
+          },
+        }
+      );
+
+      res.status(201).json({ message: 'Your signature has been updated' });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
+
+  static async uploadSignature(req, res, next) {
+    try {
+      console.log(req.file);
+
+      let { access_token } = req.headers;
+      let decode = decodedToken(access_token);
+      let user = await User.findByPk(decode.id);
+
+      if (!user) {
+        throw { name: 'NotFoundUser' };
+      }
+
+      const addToDatabase = await Signature.create({
+        signatureImage: req.file.path,
+        UserId: user.id,
+      });
+
+      console.log(addToDatabase);
+
+      res.status(201).json({ message: 'Your signature has been saved' });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
+
+  static async uploadEditSignature(req, res, next) {
+    try {
+      let { access_token } = req.headers;
+      let decode = decodedToken(access_token);
+      let user = await User.findByPk(decode.id);
+      if (!user) {
+        throw { name: 'NotFoundUser' };
+      }
+
+      await Signature.update(
+        {
+          signatureImage: req.file.path,
+        },
+        {
+          where: {
+            UserId: user.id,
+          },
+        }
+      );
+
+      res.status(201).json({ message: 'Your signature has been updated' });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
 }
 
 module.exports = Controller;

@@ -1,10 +1,36 @@
 const express = require('express');
 const router = express.Router();
 const ControllerSignature = require('../controllers/controllerSignature');
+const cloudinary = require('cloudinary').v2;
+const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+cloudinary.config({
+  cloud_name: 'dh0pchr2t',
+  api_key: '283556788176273',
+  api_secret: '4WrYWBFF8qX_1yQKPCf8S7n1yS4',
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'Esignees',
+  },
+});
+const upload = multer({ storage: storage });
 
 router.post('/', ControllerSignature.createSignature);
+router.post(
+  '/upload',
+  upload.single('file'),
+  ControllerSignature.uploadSignature
+);
 router.get('/', ControllerSignature.getSignature);
 router.put('/', ControllerSignature.editSignature);
-router.delete('/', ControllerSignature.deleteSignature);
+router.put(
+  '/upload',
+  upload.single('file'),
+  ControllerSignature.uploadEditSignature
+);
 
 module.exports = router;

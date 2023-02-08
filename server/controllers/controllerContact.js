@@ -4,6 +4,7 @@ class Controller {
   // CREATE CONTACT
   static async createContact(req, res, next) {
     try {
+      console.log(req.body);
       let UserIdOwner = req.user.id;
       let { email } = req.body;
       let userFriend = await User.findOne({ where: { email } });

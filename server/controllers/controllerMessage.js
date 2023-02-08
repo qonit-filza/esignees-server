@@ -11,6 +11,7 @@ const exiftool = require('node-exiftool');
 const exiftoolBin = require('dist-exiftool');
 const ep = new exiftool.ExiftoolProcess(exiftoolBin);
 const { editMetaTitle } = require('../helpers/exiftool');
+const { sendEmailToReceiver, sendEmailToSender } = require('../helpers/nodemailer');
 
 class Controller {
   // SEND MESSAGE
@@ -174,7 +175,7 @@ class Controller {
 
         return responseMessage;
       });
-
+      sendEmailToReceiver(receiver.email, receiver.name, sender.name)
       res.status(201).json({ message: result });
     } catch (error) {
       next(error);
@@ -194,6 +195,8 @@ class Controller {
           id: req.user.id,
         },
       });
+      const findMessage = await Message.findByPk(id)
+      const findSender = await User.findByPk(findMessage.UserIdSender)
 
       const isValidPrivateKey = await verifyPrivateKey(privateKey, publicKey);
 
@@ -232,7 +235,7 @@ class Controller {
           { transaction: t }
         );
       });
-
+      sendEmailToSender(findSender.email, findSender.name, req.user.username)
       res.status(200).json({ message: 'Document signed' });
     } catch (error) {
       console.log(error);
@@ -244,7 +247,8 @@ class Controller {
     try {
       const { id } = req.params;
       const { message } = req.body;
-
+      const findMessage = await Message.findByPk(id)
+      const findSender = await User.findByPk(findMessage.UserIdSender)
       await Message.update(
         {
           message,
@@ -255,6 +259,7 @@ class Controller {
         }
       );
       res.status(200).json({ message: `You've rejected sign request` });
+      sendEmailRejected(findSender.email, findSender.name, req.user.username)
     } catch (error) {
       console.log(error);
       next(error);

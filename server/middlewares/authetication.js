@@ -20,6 +20,7 @@ async function authetication(req, res, next) {
       id: dataUser.id,
       name: dataUser.email,
       idCompany: dataUser.Company.id,
+      username : dataUser.name
     };
     next();
   } catch (error) {

@@ -238,6 +238,140 @@ describe("POST -- Register new User & Company", () => {
   });
 });
 
+
+// LOGIN USER
+describe("POST -- Login User", () => {
+  test("201 -- Login User & Return email, role, and access_token", async () => {
+    const response = await request(app).post("/login").send({
+      email: "test@mail.com",
+      password: "password",
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual(expect.any(Object));
+    expect(response.body).toHaveProperty("access_token", expect.any(String));
+    expect(response.body).toHaveProperty("email", expect.any(String));
+    expect(response.body).toHaveProperty("role", expect.any(String));
+    access_token = response.body.access_token;
+    // console.log(access_token, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+  });
+
+  test("400 -- Bad Request", async () => {
+    const response = await request(app).post("/login").send({
+      email: "",
+      password: "",
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body).toEqual(expect.any(Object));
+    expect(response.body.message).toEqual("Email or Password is required");
+  });
+
+  test("401 -- Invalid Credentials (Email)", async () => {
+    const response = await request(app).post("/login").send({
+      email: "abc@mail.com",
+      password: "password",
+    });
+
+    expect(response.statusCode).toBe(401);
+    expect(response.body).toEqual(expect.any(Object));
+    expect(response.body.message).toEqual("Invalid Email or Password");
+  });
+
+  test("401 -- Invalid Credentials (Password)", async () => {
+    const response = await request(app).post("/login").send({
+      email: "test@mail.com",
+      password: "12345",
+    });
+
+    expect(response.statusCode).toBe(401);
+    expect(response.body).toEqual(expect.any(Object));
+    expect(response.body.message).toEqual("Invalid Email or Password");
+  });
+});
+
+// GET PROFILE DETAIL
+describe("GET -- Profile Detail", () => {
+  test("200 -- Get User detail", async () => {
+    const response = await request(app)
+      .get("/profiles")
+      .set("access_token", access_token);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual(expect.any(Object));
+    expect(response.body).toHaveProperty("name", expect.any(String));
+    expect(response.body).toHaveProperty("email", expect.any(String));
+    expect(response.body).toHaveProperty("phone", expect.any(String));
+    expect(response.body).toHaveProperty("jobTitle", expect.any(String));
+  });
+
+  test("401 -- Unauthorized", async () => {
+    const response = await request(app)
+      .get("/profiles")
+      .set("access_token", "aaa");
+
+    expect(response.statusCode).toBe(401);
+    expect(response.body).toEqual(expect.any(Object));
+    expect(response.body.message).toEqual("Unauthenticated");
+  });
+});
+
+// EDIT PROFILE
+describe("PUT -- Profile Detail", () => {
+  test("201 -- Edit User Detail", async () => {
+    const response = await request(app)
+      .put("/profiles")
+      .send({
+        name: "Edit name",
+        email: "edit@mail.com",
+        password: "new password",
+        phone: "12345",
+        jobTitle: "Editing job",
+      })
+      .set("access_token", access_token);
+
+    expect(response.statusCode).toBe(201);
+    expect(response.body).toEqual(expect.any(Object));
+    expect(response.body.message).toEqual("success edit your account Test");
+  });
+
+  test("400 -- Sequelize Validation Error", async () => {
+    const response = await request(app)
+      .put("/profiles")
+      .send({
+        // USER DATA --
+        name: "",
+        email: "",
+        phone: "",
+        password: "",
+        jobTitle: "",
+      })
+      .set("access_token", access_token);
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.message).toBe("name is required");
+    // expect(Array.isArray(response.body.message)).toBe(true);
+    // expect(response.body.message.length).toEqual(5);
+  });
+
+  test("401 -- Unauthorized", async () => {
+    const response = await request(app)
+      .put("/profiles")
+      .send({
+        name: "Edit name",
+        email: "edit@mail.com",
+        password: "new password",
+        phone: "12345",
+        jobTitle: "Editing job",
+      })
+      .set("access_token", "aaa");
+
+    expect(response.statusCode).toBe(401);
+    expect(response.body).toEqual(expect.any(Object));
+    expect(response.body.message).toEqual("Unauthenticated");
+  });
+});
+
 let access_token = "";
 // LOGIN USER
 describe("POST -- Login User", () => {

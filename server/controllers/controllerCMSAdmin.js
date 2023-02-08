@@ -116,7 +116,7 @@ class AdminController {
 
       sendEmail(data.email, data.name, privateKey)
       res.status(201).json({
-        message: `success update status ${data.name} from ${data.status} to ${status}`,
+        message: `success update status ${data.name} from ${data.status} to verified`,
       });
     } catch (error) {
       next(error);

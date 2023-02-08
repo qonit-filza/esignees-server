@@ -103,9 +103,9 @@ class Controller {
       if (!user) {
         throw { name: 'InvalidCredentials' };
       }
-      // if (user.status === "Unverified") {
-      //   throw { name: "OnProcess" };
-      // }
+      if (user.status === "Unverified") {
+        throw { name: "OnProcess" };
+      }
 
       let compare = comparePassword(password, user.password);
       if (!compare) {

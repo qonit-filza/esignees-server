@@ -14,6 +14,7 @@ const { editMetaTitle } = require("../helpers/exiftool");
 const {
   sendEmailToReceiver,
   sendEmailToSender,
+  sendEmailRejected,
 } = require("../helpers/nodemailer");
 
 class Controller {
@@ -250,8 +251,10 @@ class Controller {
     try {
       const { id } = req.params;
       const { message } = req.body;
+      // console.log(id, message, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
       const findMessage = await Message.findByPk(id);
       const findSender = await User.findByPk(findMessage.UserIdSender);
+      // console.log(findSender, "<<<<<<<<<<<<<<<<<<<<<<<<<", req.user.username);
       await Message.update(
         {
           message,
@@ -261,6 +264,8 @@ class Controller {
           where: { id },
         }
       );
+      // let msg = await Message.findOne({ where: { id } });
+      // console.log(msg, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
       sendEmailRejected(findSender.email, findSender.name, req.user.username);
       res.status(200).json({ message: `You've rejected sign request` });
     } catch (error) {
@@ -340,7 +345,7 @@ class Controller {
   static async readMessage(req, res, next) {
     try {
       let { id } = req.params;
-      console.log(id);
+      // console.log(id);
       let data = await Message.findByPk(id, {
         include: [
           {

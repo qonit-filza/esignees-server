@@ -5,9 +5,9 @@ const {
   Document,
   sequelize,
   Company,
-} = require('../models/index');
-const { readMetaData } = require('../helpers/exiftool');
-const { verifyPdf } = require('../helpers/crypto');
+} = require("../models/index");
+const { readMetaData } = require("../helpers/exiftool");
+const { verifyPdf } = require("../helpers/crypto");
 
 class Controller {
   static async getDocumentById(req, res, next) {
@@ -16,7 +16,7 @@ class Controller {
 
       const data = await Document.findByPk(id);
       if (!data) {
-        throw { name: 'NotFoundMessage' };
+        throw { name: "NotFoundMessage" };
       }
 
       res.download(`./${data.documentPath}`);
@@ -29,10 +29,10 @@ class Controller {
   static async verifyDocument(req, res, next) {
     try {
       const { Title } = await readMetaData(req.file.path);
-      console.log({ Title });
+      console.log({ Title }, "TITLE<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 
       if (!Title) {
-        throw { name: 'InvalidDocumentOrSignature' };
+        throw { name: "InvalidDocumentOrSignature" };
       }
 
       const document = await Document.findOne({
@@ -47,10 +47,10 @@ class Controller {
         ],
       });
 
-      console.log({ document });
+      // console.log({ document }, "<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 
       if (!document) {
-        throw { name: 'InvalidDocumentOrSignature' };
+        throw { name: "InvalidDocumentOrSignature" };
       }
 
       const docMessage = await Message.findByPk(document.MessageId, {
@@ -62,20 +62,21 @@ class Controller {
         },
       });
 
+      // console.log(docMessage.Documents, "DOCMESSAGE<<<<<<<<<<<<<<<<<<<<<<");
       let type;
       if (
         docMessage.Documents.length > 1 &&
         docMessage.Documents[0].digitalSignature !== null &&
         docMessage.Documents[1].metaTitle === Title
       ) {
-        type = 'signWithOther';
+        type = "signWithOther";
       } else {
-        type = 'nonSignWithOther';
+        type = "nonSignWithOther";
       }
-
+      // console.log(type, "<<<<<<<<<<<<<<<<TYPE<<<<<<<<<<<<<<<<<<<<");
       let message;
 
-      if (type === 'signWithOther') {
+      if (type === "signWithOther") {
         const tempSignInfo = [];
 
         for (const doc of docMessage.Documents) {
@@ -86,7 +87,7 @@ class Controller {
           );
 
           if (!status) {
-            throw { name: 'InvalidDocumentOrSignature' };
+            throw { name: "InvalidDocumentOrSignature" };
           }
 
           tempSignInfo.push(doc.User);
@@ -100,14 +101,15 @@ class Controller {
           };
         });
       } else {
+        // console.log("HERE>>>>>>>>>>>>>>>>>>", document.User, ">>>", document);
         const status = verifyPdf(
           document.digitalSignature,
           document.User.publicKey,
           document.documentPath
         );
-
+        // console.log(status, "STATUS <<<<<<<<<<<<<<<<<<<");
         if (!status) {
-          throw { name: 'InvalidDocumentOrSignature' };
+          throw { name: "InvalidDocumentOrSignature" };
         }
 
         message = [
@@ -119,7 +121,7 @@ class Controller {
         ];
       }
 
-      res.status(201).json({ status: 'Verified', detail: message });
+      res.status(201).json({ status: "Verified", detail: message });
     } catch (error) {
       console.log(error);
       next(error);

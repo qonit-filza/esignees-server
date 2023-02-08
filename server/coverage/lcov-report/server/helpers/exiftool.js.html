@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">27.27% </span>
+                <span class="strong">81.81% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>6/22</span>
+                <span class='fraction'>18/22</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">27.27% </span>
+                <span class="strong">81.81% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>6/22</span>
+                <span class='fraction'>18/22</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -109,9 +109,9 @@
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -121,9 +121,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -131,13 +131,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -149,10 +149,10 @@
 const exiftoolBin = require('dist-exiftool');
 const ep = new exiftool.ExiftoolProcess(exiftoolBin);
 &nbsp;
-const editMetaTitle = <span class="fstat-no" title="function not covered" >as</span>ync (filePath, newMetaTitle) =&gt; {
-<span class="cstat-no" title="statement not covered" >  try {</span>
-<span class="cstat-no" title="statement not covered" >    await ep.open();</span>
-    const write = <span class="cstat-no" title="statement not covered" >await ep.writeMetadata(</span>
+const editMetaTitle = async (filePath, newMetaTitle) =&gt; {
+  try {
+    await ep.open();
+    const write = await ep.writeMetadata(
       filePath,
       {
         all: '', // remove existing tags
@@ -162,23 +162,23 @@ const editMetaTitle = <span class="fstat-no" title="function not covered" >as</s
       ['overwrite_original']
     );
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    console.log(write);</span>
-<span class="cstat-no" title="statement not covered" >    await ep.close();</span>
-<span class="cstat-no" title="statement not covered" >    console.log('Closed exif tool');</span>
+    console.log(write);
+    await ep.close();
+    console.log('Closed exif tool');
   } catch (error) {
 <span class="cstat-no" title="statement not covered" >    console.log(error);</span>
 <span class="cstat-no" title="statement not covered" >    next(error);</span>
   }
 };
 &nbsp;
-const readMetaData = <span class="fstat-no" title="function not covered" >as</span>ync (filePath) =&gt; {
-<span class="cstat-no" title="statement not covered" >  try {</span>
-<span class="cstat-no" title="statement not covered" >    await ep.open();</span>
-    const metaData = <span class="cstat-no" title="statement not covered" >await ep.readMetadata(filePath, ['-File:all']);</span>
-<span class="cstat-no" title="statement not covered" >    await ep.close();</span>
-<span class="cstat-no" title="statement not covered" >    console.log('Closed exif tool');</span>
+const readMetaData = async (filePath) =&gt; {
+  try {
+    await ep.open();
+    const metaData = await ep.readMetadata(filePath, ['-File:all']);
+    await ep.close();
+    console.log('Closed exif tool');
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return metaData.data[0];</span>
+    return metaData.data[0];
   } catch (error) {
 <span class="cstat-no" title="statement not covered" >    console.log(error);</span>
 <span class="cstat-no" title="statement not covered" >    next(error);</span>
@@ -193,7 +193,7 @@ module.exports = { editMetaTitle, readMetaData };
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-02-08T08:21:24.724Z
+                at 2023-02-08T15:48:08.704Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

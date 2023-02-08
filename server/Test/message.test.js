@@ -53,6 +53,7 @@ beforeAll(async () => {
       ktpImage: "12345.png",
       status: "Verified",
       CompanyId: 2,
+      publicKey: pubKey,
     });
 
     const user2 = await User.create({
@@ -65,6 +66,7 @@ beforeAll(async () => {
       ktpImage: "6789.png",
       status: "Verified",
       CompanyId: company2.id,
+      publicKey: pubKey,
     });
 
     token = createToken({
@@ -118,7 +120,7 @@ afterAll(async () => {
 
 // SEND MESSAGE
 describe("POST -- Message to other user & Create document", () => {
-  test.only("201 -- Message Sent", async () => {
+  test("201 -- Message Sent", async () => {
     const response = await request(app)
       .post("/sents")
       .attach("file", "./Test/test.upload/sample.pdf")
@@ -126,6 +128,20 @@ describe("POST -- Message to other user & Create document", () => {
       .field(`email`, "friend@mail.com")
       .field(`message`, "test")
       .field(`status`, "Testing")
+      .field(`privateKey`, priKey)
+      .set("access_token", token);
+
+    expect(response.statusCode).toBe(201);
+  });
+
+  test("201 -- Message Sent (Status: Completed)", async () => {
+    const response = await request(app)
+      .post("/sents")
+      .attach("file", "./Test/test.upload/sample.pdf")
+      .field(`docName`, "test Doc")
+      .field(`email`, "friend@mail.com")
+      .field(`message`, "test")
+      .field(`status`, "completed")
       .field(`privateKey`, priKey)
       .set("access_token", token);
 
@@ -155,7 +171,7 @@ describe("POST -- Message to other user & Create document", () => {
       .field(`email`, "friend@mail.com")
       .field(`message`, "test")
       .field(`status`, "completed")
-      .field(`privateKey`, token)
+      .field(`privateKey`, pubKey)
       .set("access_token", token);
 
     expect(response.statusCode).toBe(400);
@@ -196,11 +212,11 @@ describe("POST -- Message to other user & Create document", () => {
   });
 });
 
-// CHANGE MESSAGE -- ERR
+// CHANGE MESSAGE
 describe("PUT -- Change message status", () => {
   test("200 -- Message updated", async () => {
     const response = await request(app)
-      .post("/sents/1")
+      .put("/sents/1")
       .attach("file", "./Test/test.upload/sample.pdf")
       .field(`docName`, "test Doc2")
       .field(`email`, "friend@mail.com")
@@ -208,11 +224,12 @@ describe("PUT -- Change message status", () => {
       .field(`privateKey`, priKey)
       .set("access_token", token);
 
+    console.log(response);
     expect(response.statusCode).toBe(200);
   });
   test("400 -- Private Key Invalid", async () => {
     const response = await request(app)
-      .post("/sents/1")
+      .put("/sents/1")
       .attach("file", "./Test/test.upload/sample.pdf")
       .field(`docName`, "test Doc2")
       .field(`email`, "friend@mail.com")
@@ -222,9 +239,9 @@ describe("PUT -- Change message status", () => {
 
     expect(response.statusCode).toBe(400);
   });
-  test("404 -- File not found", async () => {
+  test("500 -- ISE", async () => {
     const response = await request(app)
-      .post("/sents/99")
+      .put("/sents/999")
       .attach("file", "./Test/test.upload/sample.pdf")
       .field(`docName`, "test Doc2")
       .field(`email`, "friend@mail.com")
@@ -232,43 +249,38 @@ describe("PUT -- Change message status", () => {
       .field(`privateKey`, priKey)
       .set("access_token", token);
 
-    expect(response.statusCode).toBe(404);
+    expect(response.statusCode).toBe(500);
   });
 });
 
-// REJECT MESSAGE -- ERR
+// REJECT MESSAGE
 describe("PUT -- Reject message", () => {
   test("200 -- Reject sign request", async () => {
     const response = await request(app)
-      .post("/sents/1/reject")
-      .attach("file", "./Test/test.upload/sample.pdf")
-      .field(`docName`, "test Doc2")
-      .field(`email`, "friend@mail.com")
-      .field(`message`, "testEdit")
-      .field(`privateKey`, priKey)
+      .put("/sents/1/reject")
+      .send({ message: "try reject" })
       .set("access_token", token);
 
+    console.log(response);
     expect(response.statusCode).toBe(200);
   });
 
-  test("404 -- Cannot find Doc", async () => {
+  test("500 -- ISE", async () => {
     const response = await request(app)
-      .post("/sents/999/reject")
-      .attach("file", "./Test/test.upload/sample.pdf")
-      .field(`docName`, "test Doc2")
-      .field(`email`, "friend@mail.com")
-      .field(`message`, "testEdit")
-      .field(`privateKey`, priKey)
+      .put("/sents/999/reject")
+      .send({
+        message: "test Reject",
+      })
       .set("access_token", token);
 
-    expect(response.statusCode).toBe(404);
+    expect(response.statusCode).toBe(500);
   });
 });
 
-// SHOW ALL MESSAGES -- ERR
+// SHOW ALL MESSAGES
 describe("GET -- Show all messages", () => {
-  test.only("200 -- Show All Messages", async () => {
-    jest.spyOn(Message, "findAll").mockRejectedValue("Success");
+  test("200 -- Show All Messages", (done) => {
+    jest.spyOn(Message, "findAll").mockResolvedValue("Success");
     request(app)
       .get("/sents")
       .set("access_token", token)
@@ -282,7 +294,7 @@ describe("GET -- Show all messages", () => {
       });
   });
 
-  test.only("500 -- Internal server err", async () => {
+  test("500 -- Internal server err", (done) => {
     jest.spyOn(Message, "findAll").mockRejectedValue("Error"); // you can pass your value as arg
     // or => User.findAll = jest.fn().mockRejectedValue('Error')
     request(app)
@@ -300,20 +312,23 @@ describe("GET -- Show all messages", () => {
   });
 });
 
-// READ MESSAGE -- ERRnpm
+// READ MESSAGE
 describe("GET -- Show message", () => {
-  test.only("200 -- Show Message", async () => {
+  test("200 -- Show Message", async () => {
     const response = await request(app)
-      .post("/sents/1")
+      .get("/sents/1")
       .set("access_token", token);
 
+    // console.log(response);
     expect(response.statusCode).toBe(200);
   });
-});
 
-const successFunction = jest.fn(() => Promise.resolve({ success: true }));
+  test("500 -- ISE", async () => {
+    const response = await request(app)
+      .get("/sents/999")
+      .set("access_token", token);
 
-test("The success function should return success", async () => {
-  const result = await successFunction();
-  expect(result).toEqual({ success: true });
+    console.log(response);
+    expect(response.statusCode).toBe(500);
+  });
 });

@@ -24,8 +24,8 @@ beforeAll(async () => {
     userId = data.id;
     invalidToken =
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OCwiZW1haWwiOiJhZG1pbjRAbWFpbC5jb20iLCJpYXQiOjE2NzU2NzA5NTR9.Z_kzg2Bx3jh8OK90oVQC2JNlGdM-LQ0tUymc98saxGA";
-    await queryInterface.bulkInsert(
-      "Companies",
+
+    let company = await Company.bulkCreate([
       {
         nameCompany: "testing company",
         legalName: "the real test",
@@ -35,43 +35,67 @@ beforeAll(async () => {
         industry: "education",
         companySize: "mikro company",
       },
-      {}
-    );
+    ]);
+    // await queryInterface.bulkInsert(
+    //   "Companies",
+    //   {
+    //     nameCompany: "testing company",
+    //     legalName: "the real test",
+    //     address: "Jl. sandi negara",
+    //     phoneCompany: "(021) 80976123",
+    //     emailCompany: "companytest@mail.com",
+    //     industry: "education",
+    //     companySize: "mikro company",
+    //   },
+    //   {}
+    // );
+    const user = await User.create({
+      name: "test",
+      role: "admin",
+      email: "usertest@mail.com",
+      phone: "09871273251635",
+      password: hashPassword("usertest"),
+      jobTitle: "manager",
+      ktpId: "67123138102320",
+      publicKey: " ",
+      ktpImage: "http://image.ktp",
+      status: "unverified",
+      CompanyId: 1,
+    });
 
-    await queryInterface.bulkInsert(
-      "Users",
-      [
-        {
-          name: "test",
-          role: "admin",
-          email: "usertest@mail.com",
-          phone: "09871273251635",
-          password: hashPassword("usertest"),
-          jobTitle: "manager",
-          ktpId: "67123138102320",
-          publicKey: generateKeyPair(),
-          ktpImage: "http://image.ktp",
-          status: "unverified",
-          CompanyId: 1,
-        },
-        {
-          name: "test1",
-          role: "admin",
-          email: "usertest1@mail.com",
-          phone: "09871273251635",
-          password: hashPassword("usertest1"),
-          jobTitle: "manager",
-          ktpId: "67123138102321",
-          publicKey: generateKeyPair(),
-          ktpImage: "http://image.ktp1",
-          status: "unverified",
-          CompanyId: 1,
-        },
-      ],
-      {}
-    );
+    //  const user = await User.bulkCreate(
+    //     [
+    //       {
+    //         name: "test",
+    //         role: "admin",
+    //         email: "usertest@mail.com",
+    //         phone: "09871273251635",
+    //         password: hashPassword("usertest"),
+    //         jobTitle: "manager",
+    //         ktpId: "67123138102320",
+    //         publicKey: " ",
+    //         ktpImage: "http://image.ktp",
+    //         status: "unverified",
+    //         CompanyId: 1,
+    //       },
+    //       {
+    //         name: "test1",
+    //         role: "admin",
+    //         email: "usertest1@mail.com",
+    //         phone: "09871273251635",
+    //         password: hashPassword("usertest1"),
+    //         jobTitle: "manager",
+    //         ktpId: "67123138102321",
+    //         publicKey: " ",
+    //         ktpImage: "http://image.ktp1",
+    //         status: "unverified",
+    //         CompanyId: 1,
+    //       },
+    //     ],
+    //   );
+    //   console.log(user, "user test");
   } catch (error) {
-    console.log(error);
+    console.log(error, "error beforeall");
   }
 });
 
@@ -248,17 +272,17 @@ describe("admin routes test", () => {
   });
 
   describe("GET data user", () => {
-    test("404 cant get data user", async () => {
+    test("200  get data user", async () => {
       const response = await request(app)
         .get("/adm/users")
         .set("access_token", validToken);
       // console.log(response, "true");
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(200);
     });
 
     test("404 cant get data user", async () => {
       const response = await request(app)
-        .get("/adm/users?search=test1")
+        .get("/adm/users?search=mini")
         .set("access_token", validToken);
       expect(response.status).toBe(404);
     });
@@ -296,9 +320,9 @@ describe("admin routes test", () => {
     });
 
     test("500 error fetch data user By Id ", (done) => {
-      jest.spyOn(User, "findByPk").mockRejectedValue("NotFoundUser");
+      jest.spyOn(User, "findByPk").mockRejectedValue("Error");
       request(app)
-        .get("/users/1")
+        .get(`/adm/users/1`)
         .set("access_token", validToken)
         .then((res) => {
           expect(res.status).toBe(500);
@@ -335,8 +359,24 @@ describe("admin routes test", () => {
         .patch(`/adm/users/1`)
         .set("access_token", validToken)
         .send({ status: "Verified" });
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(201);
       expect(response.body).toBeInstanceOf(Object);
+    });
+
+    test("500 error fetch data user By Id ", (done) => {
+      jest.spyOn(User, "findByPk").mockRejectedValue("Error");
+      request(app)
+        .patch(`/adm/users/1`)
+        .set("access_token", validToken)
+        .then((res) => {
+          expect(res.status).toBe(500);
+          expect(res.body).toHaveProperty("message", "Internal server error");
+          expect(res.body).toBeInstanceOf(Object);
+          done();
+        })
+        .catch((err) => {
+          done(err);
+        });
     });
 
     test("401 update status without access token", async () => {
@@ -362,6 +402,14 @@ describe("admin routes test", () => {
     test("200 success delete user", async () => {
       const response = await request(app)
         .delete(`/adm/users/1`)
+        .set("access_token", validToken);
+      console.log(response, "delete");
+      expect(response.status).toBe(200);
+    });
+
+    test("500 cant  delete user", async () => {
+      const response = await request(app)
+        .delete(`/adm/users/2`)
         .set("access_token", validToken);
       console.log(response, "delete");
       expect(response.status).toBe(500);

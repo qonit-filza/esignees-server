@@ -13,6 +13,10 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+router.get('/', (req, res) => {
+  res.json({ message: 'ok' });
+});
+
 const user = require('./user');
 router.use('/', user);
 

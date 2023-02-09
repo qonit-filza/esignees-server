@@ -1,11 +1,11 @@
-const { User, Company, sequelize, Signature } = require('../models/index');
-const { createToken, decodedToken } = require('../helpers/jwt');
-const cloudinary = require('cloudinary').v2;
+const { User, Company, sequelize, Signature } = require("../models/index");
+const { createToken, decodedToken } = require("../helpers/jwt");
+const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
-  cloud_name: 'dh0pchr2t',
-  api_key: '283556788176273',
-  api_secret: '4WrYWBFF8qX_1yQKPCf8S7n1yS4',
+  cloud_name: "dh0pchr2t",
+  api_key: "283556788176273",
+  api_secret: "4WrYWBFF8qX_1yQKPCf8S7n1yS4",
 });
 
 class Controller {
@@ -16,7 +16,7 @@ class Controller {
       let decode = decodedToken(access_token);
       let user = await User.findByPk(decode.id);
       if (!user) {
-        throw { name: 'NotFoundUser' };
+        throw { name: "NotFoundUser" };
       }
 
       const result = await cloudinary.uploader.upload(signatureImage, {
@@ -33,7 +33,7 @@ class Controller {
 
       console.log(addToDatabase);
 
-      res.status(201).json({ message: 'Your signature has been saved' });
+      res.status(201).json({ message: "Your signature has been saved" });
     } catch (error) {
       next(error);
     }
@@ -45,7 +45,7 @@ class Controller {
       let decode = decodedToken(access_token);
       let user = await User.findByPk(decode.id);
       if (!user) {
-        throw { name: 'NotFoundUser' };
+        throw { name: "NotFoundUser" };
       }
 
       const signature = await Signature.findOne({
@@ -70,7 +70,7 @@ class Controller {
       let decode = decodedToken(access_token);
       let user = await User.findByPk(decode.id);
       if (!user) {
-        throw { name: 'NotFoundUser' };
+        throw { name: "NotFoundUser" };
       }
 
       const result = await cloudinary.uploader.upload(signatureImage, {
@@ -91,7 +91,7 @@ class Controller {
         }
       );
 
-      res.status(201).json({ message: 'Your signature has been updated' });
+      res.status(201).json({ message: "Your signature has been updated" });
     } catch (error) {
       console.log(error);
       next(error);
@@ -107,7 +107,7 @@ class Controller {
       let user = await User.findByPk(decode.id);
 
       if (!user) {
-        throw { name: 'NotFoundUser' };
+        throw { name: "NotFoundUser" };
       }
 
       const addToDatabase = await Signature.create({
@@ -117,7 +117,7 @@ class Controller {
 
       console.log(addToDatabase);
 
-      res.status(201).json({ message: 'Your signature has been saved' });
+      res.status(201).json({ message: "Your signature has been saved" });
     } catch (error) {
       console.log(error);
       next(error);
@@ -130,7 +130,7 @@ class Controller {
       let decode = decodedToken(access_token);
       let user = await User.findByPk(decode.id);
       if (!user) {
-        throw { name: 'NotFoundUser' };
+        throw { name: "NotFoundUser" };
       }
 
       await Signature.update(
@@ -144,7 +144,7 @@ class Controller {
         }
       );
 
-      res.status(201).json({ message: 'Your signature has been updated' });
+      res.status(201).json({ message: "Your signature has been updated" });
     } catch (error) {
       console.log(error);
       next(error);

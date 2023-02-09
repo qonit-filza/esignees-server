@@ -5,13 +5,17 @@ const {
   Document,
   sequelize,
   Company,
-} = require('../models/index');
-const { signPdf, verifyPdf, verifyPrivateKey } = require('../helpers/crypto');
-const exiftool = require('node-exiftool');
-const exiftoolBin = require('dist-exiftool');
+} = require("../models/index");
+const { signPdf, verifyPdf, verifyPrivateKey } = require("../helpers/crypto");
+const exiftool = require("node-exiftool");
+const exiftoolBin = require("dist-exiftool");
 const ep = new exiftool.ExiftoolProcess(exiftoolBin);
-const { editMetaTitle } = require('../helpers/exiftool');
-const { sendEmailToReceiver, sendEmailToSender } = require('../helpers/nodemailer');
+const { editMetaTitle } = require("../helpers/exiftool");
+const {
+  sendEmailToReceiver,
+  sendEmailToSender,
+  sendEmailRejected,
+} = require("../helpers/nodemailer");
 
 class Controller {
   // SEND MESSAGE
@@ -115,7 +119,7 @@ class Controller {
 
       //write metadata
       const date = new Date();
-      const metaTitle = docName + '-' + date.toLocaleString('id-ID');
+      const metaTitle = docName + "-" + date.toLocaleString("id-ID");
       await editMetaTitle(req.file.path, metaTitle);
 
       const sender = await User.findOne({
@@ -126,18 +130,18 @@ class Controller {
 
       const receiver = await User.findOne({ where: { email } });
       if (!receiver) {
-        throw { name: 'NotFoundMessage' };
+        throw { name: "NotFoundMessage" };
       }
 
-      if (status === 'completed' || status === 'completed-waiting') {
-        console.log('signing document...');
+      if (status === "completed" || status === "completed-waiting") {
+        console.log("signing document...");
         const isValidPrivateKey = await verifyPrivateKey(
           privateKey,
           sender.publicKey
         );
 
         if (!isValidPrivateKey) {
-          throw { name: 'InvalidPrivateKey' };
+          throw { name: "InvalidPrivateKey" };
         }
       }
 
@@ -154,11 +158,11 @@ class Controller {
         );
 
         let digitalSignature;
-        let responseMessage = 'Document has been delivered';
-        if (status === 'completed' || status === 'completed-waiting') {
+        let responseMessage = "Document has been delivered";
+        if (status === "completed" || status === "completed-waiting") {
           const signature = signPdf(privateKey, req.file.path);
           digitalSignature = signature;
-          responseMessage = 'Document has been signed and delivered';
+          responseMessage = "Document has been signed and delivered";
         }
 
         await Document.create(
@@ -175,7 +179,7 @@ class Controller {
 
         return responseMessage;
       });
-      sendEmailToReceiver(receiver.email, receiver.name, sender.name)
+      sendEmailToReceiver(receiver.email, receiver.name, sender.name);
       res.status(201).json({ message: result });
     } catch (error) {
       next(error);
@@ -187,25 +191,25 @@ class Controller {
     try {
       const { id } = req.params;
       const { docName, email, message, privateKey } = req.body;
-      console.log(req.file);
-      console.log(req.body);
+      // console.log(req.file);
+      // console.log(req.body);
 
       const { publicKey } = await User.findOne({
         where: {
           id: req.user.id,
         },
       });
-      const findMessage = await Message.findByPk(id)
-      const findSender = await User.findByPk(findMessage.UserIdSender)
+      const findMessage = await Message.findByPk(id);
+      const findSender = await User.findByPk(findMessage.UserIdSender);
 
       const isValidPrivateKey = await verifyPrivateKey(privateKey, publicKey);
 
       if (!isValidPrivateKey) {
-        throw { name: 'InvalidPrivateKey' };
+        throw { name: "InvalidPrivateKey" };
       }
 
       const date = new Date();
-      const metaTitle = docName + '-' + date.toLocaleString('id-ID');
+      const metaTitle = docName + "-" + date.toLocaleString("id-ID");
       await editMetaTitle(req.file.path, metaTitle);
       const digitalSignature = signPdf(privateKey, req.file.path);
 
@@ -213,7 +217,7 @@ class Controller {
         await Message.update(
           {
             message,
-            status: 'completed',
+            status: "completed",
           },
           {
             where: { id },
@@ -235,8 +239,8 @@ class Controller {
           { transaction: t }
         );
       });
-      sendEmailToSender(findSender.email, findSender.name, req.user.username)
-      res.status(200).json({ message: 'Document signed' });
+      sendEmailToSender(findSender.email, findSender.name, req.user.username);
+      res.status(200).json({ message: "Document signed" });
     } catch (error) {
       console.log(error);
       next(error);
@@ -247,18 +251,22 @@ class Controller {
     try {
       const { id } = req.params;
       const { message } = req.body;
-      const findMessage = await Message.findByPk(id)
-      const findSender = await User.findByPk(findMessage.UserIdSender)
+      // console.log(id, message, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+      const findMessage = await Message.findByPk(id);
+      const findSender = await User.findByPk(findMessage.UserIdSender);
+      // console.log(findSender, "<<<<<<<<<<<<<<<<<<<<<<<<<", req.user.username);
       await Message.update(
         {
           message,
-          status: 'rejected',
+          status: "rejected",
         },
         {
           where: { id },
         }
       );
-      sendEmailRejected(findSender.email, findSender.name, req.user.username)
+      // let msg = await Message.findOne({ where: { id } });
+      // console.log(msg, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+      sendEmailRejected(findSender.email, findSender.name, req.user.username);
       res.status(200).json({ message: `You've rejected sign request` });
     } catch (error) {
       console.log(error);
@@ -300,7 +308,7 @@ class Controller {
         include: [
           {
             model: User,
-            as: 'Sender',
+            as: "Sender",
             include: {
               model: Company,
             },
@@ -316,7 +324,7 @@ class Controller {
         include: [
           {
             model: User,
-            as: 'Receiver',
+            as: "Receiver",
             include: {
               model: Company,
             },
@@ -337,6 +345,7 @@ class Controller {
   static async readMessage(req, res, next) {
     try {
       let { id } = req.params;
+      // console.log(id);
       let data = await Message.findByPk(id, {
         include: [
           {
@@ -347,16 +356,16 @@ class Controller {
           },
           {
             model: User,
-            as: 'Receiver',
+            as: "Receiver",
           },
           {
             model: User,
-            as: 'Sender',
+            as: "Sender",
           },
         ],
       });
       let UserSender = await User.findByPk(data.UserIdSender, {
-        attributes: { exclude: ['password'] },
+        attributes: { exclude: ["password"] },
       });
       // let userReceiver = await User.findByPk(data.UserIdReceiver)
       res.status(200).json({ data, UserSender });

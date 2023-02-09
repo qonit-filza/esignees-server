@@ -29,7 +29,6 @@ class Controller {
   static async verifyDocument(req, res, next) {
     try {
       const { Title } = await readMetaData(req.file.path);
-      // console.log({ Title });
 
       if (!Title) {
         throw { name: 'InvalidDocumentOrSignature' };
@@ -46,8 +45,6 @@ class Controller {
           { model: Message, include: Document },
         ],
       });
-
-      // console.log({ document });
 
       if (!document) {
         throw { name: 'InvalidDocumentOrSignature' };
@@ -72,7 +69,6 @@ class Controller {
       } else {
         type = 'nonSignWithOther';
       }
-
       let message;
 
       if (type === 'signWithOther') {
@@ -119,7 +115,6 @@ class Controller {
           document.User.publicKey,
           req.file.path
         );
-
         if (!status) {
           throw { name: 'InvalidDocumentOrSignature' };
         }

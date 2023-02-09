@@ -32,7 +32,7 @@ const userTest1 = {
   ktpImage: "http://image.ktp1",
   status: "unverified",
   CompanyId: 10,
-}
+};
 
 beforeAll(async () => {
   try {
@@ -63,23 +63,22 @@ beforeAll(async () => {
 
     invalidToken = createToken({
       id: 3,
-      email: "invalid@mail.com"
-    })
-      
+      email: "invalid@mail.com",
+    });
 
-    let data1 = await User.create(userTest1)
+    let data1 = await User.create(userTest1);
     validToken1 = createToken({
       id: data1.id,
-      email: data1.email
-    })
+      email: data1.email,
+    });
   } catch (error) {
     console.log(error);
   }
 });
 
 beforeEach(() => {
-  jest.restoreAllMocks()
-})
+  jest.restoreAllMocks();
+});
 
 afterAll(async () => {
   try {
@@ -110,21 +109,20 @@ describe("company route test", () => {
     });
 
     test("error cant get company data", (done) => {
-      jest.spyOn(Company, "findAll").mockRejectedValue("Error")
+      jest.spyOn(Company, "findAll").mockRejectedValue("Error");
       request(app)
-      .get("/companies")
-      .set("access_token", validToken)
-      .then((res) => {
-        expect(res.status).toBe(500)
-        expect(res.body).toHaveProperty("message", "Internal server error")
-        expect(res.body).toBeInstanceOf(Object)
-        done()
-      })
-      .catch((err) =>{
-        done(err)
-      })
-    })
-
+        .get("/companies")
+        .set("access_token", validToken)
+        .then((res) => {
+          expect(res.status).toBe(500);
+          expect(res.body).toHaveProperty("message", "Internal server error");
+          expect(res.body).toBeInstanceOf(Object);
+          done();
+        })
+        .catch((err) => {
+          done(err);
+        });
+    });
 
     test("401 cant get company data with invalid access token", async () => {
       const response = await request(app)
@@ -208,83 +206,83 @@ describe("company route test", () => {
         .post("/companies/createMidtransToken/500000")
         .set("access_token", validToken);
       expect(response.status).toBe(201);
-      expect(response.body).toBeInstanceOf(Object)
-      expect(response.body).toHaveProperty("token")
-      expect(response.body).toHaveProperty("redirect_url")
+      expect(response.body).toBeInstanceOf(Object);
+      expect(response.body).toHaveProperty("token");
+      expect(response.body).toHaveProperty("redirect_url");
     });
 
     test("500 error midtrans token and transaction", (done) => {
-      jest.spyOn(Company, "update").mockRejectedValue('Error')
+      jest.spyOn(Company, "update").mockRejectedValue("Error");
       request(app)
-      .put("/companies")
-      .set("access_token", validToken)
-      .then((res) => {
-        expect(res.status).toBe(500)
-        expect(res.body).toHaveProperty("message", "Internal server error")
-        expect(res.body).toBeInstanceOf(Object)
-        done()
-      })
-      .catch((err) =>{
-        done(err)
-      })
-    })
+        .put("/companies")
+        .set("access_token", validToken)
+        .then((res) => {
+          expect(res.status).toBe(500);
+          expect(res.body).toHaveProperty("message", "Internal server error");
+          expect(res.body).toBeInstanceOf(Object);
+          done();
+        })
+        .catch((err) => {
+          done(err);
+        });
+    });
 
     test("401 cant create midtrans token with invalid price", async () => {
-        const response = await request(app)
-          .put("/companies/createMidtransToken/ ")
-          .set("access_token", validToken);
-        expect(response.status).toBe(404);
-        expect(response.body).toBeInstanceOf(Object);
-      });
+      const response = await request(app)
+        .put("/companies/createMidtransToken/ ")
+        .set("access_token", validToken);
+      expect(response.status).toBe(404);
+      expect(response.body).toBeInstanceOf(Object);
+    });
 
     test("401 cant create midtrans token with invalid access token", async () => {
-        const response = await request(app)
-          .put("/companies/createMidtransToken/500000")
-          .set("access_token", "invalidToken");
-        expect(response.status).toBe(401);
-        expect(response.body).toBeInstanceOf(Object);
-        expect(response.body).toHaveProperty("message", "Unauthenticated");
-      });
-  
-      test("401 cant create midtrans token without access token", async () => {
-        const response = await request(app).put("/companies/createMidtransToken/500000");
-        expect(response.status).toBe(401);
-        expect(response.body).toBeInstanceOf(Object);
-        expect(response.body).toHaveProperty("message", "Unauthenticated");
-      });
+      const response = await request(app)
+        .put("/companies/createMidtransToken/500000")
+        .set("access_token", "invalidToken");
+      expect(response.status).toBe(401);
+      expect(response.body).toBeInstanceOf(Object);
+      expect(response.body).toHaveProperty("message", "Unauthenticated");
+    });
 
-      test("500 error midtrans token and transaction", (done) => {
-        jest.spyOn(User, "findByPk").mockRejectedValue('Error')
-        request(app)
+    test("401 cant create midtrans token without access token", async () => {
+      const response = await request(app).put(
+        "/companies/createMidtransToken/500000"
+      );
+      expect(response.status).toBe(401);
+      expect(response.body).toBeInstanceOf(Object);
+      expect(response.body).toHaveProperty("message", "Unauthenticated");
+    });
+
+    test("500 error midtrans token and transaction", (done) => {
+      jest.spyOn(User, "findByPk").mockRejectedValue("Error");
+      request(app)
         .put("/companies/createMidtransToken/500000")
         .set("access_token", validToken)
         .then((res) => {
-          expect(res.status).toBe(500)
-          expect(res.body).toHaveProperty("message", "Internal server error")
-          expect(res.body).toBeInstanceOf(Object)
-          done()
+          expect(res.status).toBe(500);
+          expect(res.body).toHaveProperty("message", "Internal server error");
+          expect(res.body).toBeInstanceOf(Object);
+          done();
         })
-        .catch((err) =>{
-          done(err)
-        })
-      })
+        .catch((err) => {
+          done(err);
+        });
+    });
 
-      test("500 error midtrans token and transaction", (done) => {
-        jest.spyOn(Company, "findByPk").mockRejectedValue('Error')
-        request(app)
+    test("500 error midtrans token and transaction", (done) => {
+      jest.spyOn(Company, "findByPk").mockRejectedValue("Error");
+      request(app)
         .put("/companies/check")
         .set("access_token", validToken)
         .then((res) => {
-          expect(res.status).toBe(500)
-          expect(res.body).toHaveProperty("message", "Internal server error")
-          expect(res.body).toBeInstanceOf(Object)
-          done()
+          expect(res.status).toBe(500);
+          expect(res.body).toHaveProperty("message", "Internal server error");
+          expect(res.body).toBeInstanceOf(Object);
+          done();
         })
-        .catch((err) =>{
-          done(err)
-        })
-      })
-
-      
+        .catch((err) => {
+          done(err);
+        });
+    });
   });
 });

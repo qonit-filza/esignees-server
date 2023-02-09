@@ -286,19 +286,19 @@ function sendEmail(email, name, privateKey) {
 }
 
 function sendEmailToReceiver(email, name, senderName) {
-    let transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "nabilusnup@gmail.com",
-        pass: "pqpmsjeqffktukxr",
-      },
-    });
-  
-    let mailOptions = {
-      from: "nabilusnup@gmail.com",
-      to: email,
-      subject: "You have a new signature request",
-      html: `
+  let transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "nabilusnup@gmail.com",
+      pass: "pqpmsjeqffktukxr",
+    },
+  });
+
+  let mailOptions = {
+    from: "nabilusnup@gmail.com",
+    to: email,
+    subject: "You have a new signature request",
+    html: `
       <div class="es-wrapper-color">
       <!--[if gte mso 9]>
           <v:background xmlns:v="urn:schemas-microsoft-com:vml" fill="t">
@@ -552,28 +552,28 @@ function sendEmailToReceiver(email, name, senderName) {
       </table>
   </div>
       `,
-    };
-  
-    transporter.sendMail(mailOptions, (err, info) => {
-      if (err) throw err;
-      console.log("Email sent: " + info.response);
-    });
-  }
+  };
 
-  function sendEmailToSender(email, nameSender, nameReceiver) {
-    let transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "nabilusnup@gmail.com",
-        pass: "pqpmsjeqffktukxr",
-      },
-    });
-  
-    let mailOptions = {
-      from: "nabilusnup@gmail.com",
-      to: email,
-      subject: "Your sign request has been completed",
-      html: `
+  transporter.sendMail(mailOptions, (err, info) => {
+    if (err) throw err;
+    console.log("Email sent: " + info.response);
+  });
+}
+
+function sendEmailToSender(email, nameSender, nameReceiver) {
+  let transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "nabilusnup@gmail.com",
+      pass: "pqpmsjeqffktukxr",
+    },
+  });
+
+  let mailOptions = {
+    from: "nabilusnup@gmail.com",
+    to: email,
+    subject: "Your sign request has been completed",
+    html: `
       <div class="es-wrapper-color">
       <!--[if gte mso 9]>
           <v:background xmlns:v="urn:schemas-microsoft-com:vml" fill="t">
@@ -827,28 +827,28 @@ function sendEmailToReceiver(email, name, senderName) {
       </table>
   </div>
       `,
-    };
-  
-    transporter.sendMail(mailOptions, (err, info) => {
-      if (err) throw err;
-      console.log("Email sent: " + info.response);
-    });
-  }
+  };
 
-  function sendEmailRejected(email, nameSender, nameReceiver) {
-    let transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "nabilusnup@gmail.com",
-        pass: "pqpmsjeqffktukxr",
-      },
-    });
-  
-    let mailOptions = {
-      from: "nabilusnup@gmail.com",
-      to: email,
-      subject: "Your sign request is rejected!",
-      html: `
+  transporter.sendMail(mailOptions, (err, info) => {
+    if (err) throw err;
+    console.log("Email sent: " + info.response);
+  });
+}
+
+function sendEmailRejected(email, nameSender, nameReceiver) {
+  let transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "nabilusnup@gmail.com",
+      pass: "pqpmsjeqffktukxr",
+    },
+  });
+
+  let mailOptions = {
+    from: "nabilusnup@gmail.com",
+    to: email,
+    subject: "Your sign request is rejected!",
+    html: `
       <div class="es-wrapper-color">
       <!--[if gte mso 9]>
           <v:background xmlns:v="urn:schemas-microsoft-com:vml" fill="t">
@@ -1102,12 +1102,17 @@ function sendEmailToReceiver(email, name, senderName) {
       </table>
   </div>
       `,
-    };
-  
-    transporter.sendMail(mailOptions, (err, info) => {
-      if (err) throw err;
-      console.log("Email sent: " + info.response);
-    });
-  }
+  };
 
-module.exports = { sendEmail, sendEmailToReceiver, sendEmailToSender, sendEmailRejected};
+  transporter.sendMail(mailOptions, (err, info) => {
+    if (err) throw err;
+    console.log("Email sent: " + info.response);
+  });
+}
+
+module.exports = {
+  sendEmail,
+  sendEmailToReceiver,
+  sendEmailToSender,
+  sendEmailRejected,
+};

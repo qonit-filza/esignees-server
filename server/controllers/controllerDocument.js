@@ -78,24 +78,33 @@ class Controller {
       if (type === 'signWithOther') {
         const tempSignInfo = [];
 
-        for (const doc of docMessage.Documents) {
-          const status = verifyPdf(
-            doc.digitalSignature,
-            doc.User.publicKey,
-            doc.documentPath
-          );
-
-          if (!status) {
-            throw { name: 'InvalidDocumentOrSignature' };
-          }
-
-          //change
-          tempSignInfo.push({
-            name: doc.User.name,
-            email: doc.User.email,
-            createdAt: doc.createdAt,
-          });
+        const statusPdf1 = verifyPdf(
+          document.digitalSignature,
+          document.User.publicKey,
+          req.file.path
+        );
+        if (!statusPdf1) {
+          throw { name: 'InvalidDocumentOrSignature' };
         }
+        tempSignInfo.push({
+          name: document.User.name,
+          email: document.User.email,
+          createdAt: document.createdAt,
+        });
+
+        const statusPdf2 = verifyPdf(
+          docMessage.Documents[0].digitalSignature,
+          docMessage.Documents[0].User.publicKey,
+          docMessage.Documents[0].documentPath
+        );
+        if (!statusPdf2) {
+          throw { name: 'InvalidDocumentOrSignature' };
+        }
+        tempSignInfo.push({
+          name: docMessage.Documents[0].User.name,
+          email: docMessage.Documents[0].User.email,
+          createdAt: docMessage.Documents[0].createdAt,
+        });
 
         message = tempSignInfo.map((el) => {
           return {
@@ -108,7 +117,7 @@ class Controller {
         const status = verifyPdf(
           document.digitalSignature,
           document.User.publicKey,
-          document.documentPath
+          req.file.path
         );
 
         if (!status) {

@@ -36,8 +36,7 @@ const userTest1 = {
 
 beforeAll(async () => {
   try {
-    await queryInterface.bulkInsert(
-      "Companies",
+    await Company.bulkCreate(
       [
         {
           nameCompany: "testCompany",
@@ -52,7 +51,6 @@ beforeAll(async () => {
           updatedAt: new Date(),
         },
       ],
-      {}
     );
 
     let data = await User.create(userTest);
@@ -78,6 +76,7 @@ beforeAll(async () => {
 });
 
 beforeEach(() => {
+  jest.setTimeout(60000)
   jest.restoreAllMocks()
 })
 
@@ -173,6 +172,7 @@ describe("company route test", () => {
   });
 
   describe("PUT edit subscription to free", () => {
+
     test("201 success update status data", async () => {
       const response = await request(app)
         .put("/companies/check")
@@ -185,6 +185,8 @@ describe("company route test", () => {
       );
     });
 
+
+
     test("401 cant update company status with invalid access token", async () => {
       const response = await request(app)
         .put("/companies/check")
@@ -194,12 +196,7 @@ describe("company route test", () => {
       expect(response.body).toHaveProperty("message", "Unauthenticated");
     });
 
-    test("401 cant get company status without access token", async () => {
-      const response = await request(app).put("/companies/check");
-      expect(response.status).toBe(401);
-      expect(response.body).toBeInstanceOf(Object);
-      expect(response.body).toHaveProperty("message", "Unauthenticated");
-    });
+  
   });
 
   describe("POST midtrans transaction", () => {

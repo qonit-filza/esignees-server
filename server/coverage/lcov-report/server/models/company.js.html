@@ -162,23 +162,26 @@
 <a name='L97'></a><a href='#L97'>97</a>
 <a name='L98'></a><a href='#L98'>98</a>
 <a name='L99'></a><a href='#L99'>99</a>
-<a name='L100'></a><a href='#L100'>100</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -255,16 +258,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use strict';
-const {
-  Model
-} = require('sequelize');
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) =&gt; {
   class Company extends Model {
     /**
@@ -274,100 +278,105 @@ module.exports = (sequelize, DataTypes) =&gt; {
      */
     static associate(models) {
       // define association here
-      Company.hasMany(models.User, {foreignKey: "CompanyId"})
+      Company.hasMany(models.User, { foreignKey: "CompanyId" });
     }
   }
-  Company.init({
-    nameCompany: {
-      type : DataTypes.STRING,
-      allowNull : false,
-      validate: {
-        notNull: {
-          msg: `company name is required`,
-        },
-        notEmpty: {
-          msg: `company name is required`,
+  Company.init(
+    {
+      nameCompany: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: `company name is required`,
+          },
+          notEmpty: {
+            msg: `company name is required`,
+          },
         },
       },
+      legalName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: `legal name company is required`,
+          },
+          notEmpty: {
+            msg: `legal name company is required`,
+          },
+        },
+      },
+      address: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: `address company is required`,
+          },
+          notEmpty: {
+            msg: `address company is required`,
+          },
+        },
+      },
+      phoneCompany: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: `phone number company is required`,
+          },
+          notEmpty: {
+            msg: `phone number company is required`,
+          },
+        },
+      },
+      emailCompany: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: `email company is required`,
+          },
+          notEmpty: {
+            msg: `email company is required`,
+          },
+          isEmail: {
+            msg: `email company is not valid`,
+          },
+        },
+        unique: {
+          args: true,
+          msg: "email company address already in use!",
+        },
+      },
+      industry: DataTypes.STRING,
+      companySize: DataTypes.STRING,
+      companyInviteCode: DataTypes.STRING,
+      status: DataTypes.STRING,
+      dueDate: DataTypes.DATE,
     },
-    legalName: {
-      type : DataTypes.STRING,
-      allowNull : false,
-      validate: {
-        notNull: {
-          msg: `legal name company is required`,
-        },
-        notEmpty: {
-          msg: `legal name company is required`,
-        },
-      },
-    },
-    address: {
-      type : DataTypes.STRING,
-      allowNull : false,
-      validate: {
-        notNull: {
-          msg: `address company is required`,
-        },
-        notEmpty: {
-          msg: `address company is required`,
-        },
-      },
-    },
-    phoneCompany: {
-      type : DataTypes.STRING,
-      allowNull : false,
-      validate: {
-        notNull: {
-          msg: `phone number company is required`,
-        },
-        notEmpty: {
-          msg: `phone number company is required`,
-        },
-      },
-    },
-    emailCompany: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: `email company is required`,
-        },
-        notEmpty: {
-          msg: `email company is required`,
-        },
-        isEmail: {
-          msg: `email company is not valid`,
-        },
-      },
-      unique: {
-        args: true,
-        msg: "email company address already in use!",
-      },
-    },
-    industry: DataTypes.STRING,
-    companySize: DataTypes.STRING,
-    companyInviteCode: DataTypes.STRING,
-    status: DataTypes.STRING,
-    dueDate: DataTypes.DATE
-  }, {
-    sequelize,
-    modelName: 'Company',
+    {
+      sequelize,
+      modelName: "Company",
+    }
+  );
+  Company.beforeCreate((item) =&gt; {
+    item.companyInviteCode =
+      "E-signess-" + Math.floor(1000000 + Math.random() * 9999999);
+    item.status = "Free";
+    return item;
   });
-  Company.beforeCreate((item)=&gt;{
-    item.companyInviteCode = "E-signess-" + Math.floor(1000000 + Math.random()*9999999)
-    item.status = "Free"
-    return item
-  })
   return Company;
-};</pre></td></tr></table></pre>
+};
+&nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-02-08T06:40:19.716Z
+                at 2023-02-09T03:45:08.191Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

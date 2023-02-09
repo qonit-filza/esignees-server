@@ -15,9 +15,6 @@ class Controller {
       let { signatureImage } = req.body;
       let decode = decodedToken(access_token);
       let user = await User.findByPk(decode.id);
-      if (!user) {
-        throw { name: 'NotFoundUser' };
-      }
 
       const result = await cloudinary.uploader.upload(signatureImage, {
         use_filename: true,
@@ -31,7 +28,6 @@ class Controller {
         UserId: user.id,
       });
 
-      console.log(addToDatabase);
 
       res.status(201).json({ message: 'Your signature has been saved' });
     } catch (error) {
@@ -44,9 +40,6 @@ class Controller {
       let { access_token } = req.headers;
       let decode = decodedToken(access_token);
       let user = await User.findByPk(decode.id);
-      if (!user) {
-        throw { name: 'NotFoundUser' };
-      }
 
       const signature = await Signature.findOne({
         where: {
@@ -69,9 +62,6 @@ class Controller {
       let { signatureImage } = req.body;
       let decode = decodedToken(access_token);
       let user = await User.findByPk(decode.id);
-      if (!user) {
-        throw { name: 'NotFoundUser' };
-      }
 
       const result = await cloudinary.uploader.upload(signatureImage, {
         use_filename: true,
@@ -93,22 +83,18 @@ class Controller {
 
       res.status(201).json({ message: 'Your signature has been updated' });
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
 
   static async uploadSignature(req, res, next) {
     try {
-      console.log(req.file);
+      console.log(req.file, "file");
 
       let { access_token } = req.headers;
       let decode = decodedToken(access_token);
       let user = await User.findByPk(decode.id);
 
-      if (!user) {
-        throw { name: 'NotFoundUser' };
-      }
 
       const addToDatabase = await Signature.create({
         signatureImage: req.file.path,
@@ -129,9 +115,7 @@ class Controller {
       let { access_token } = req.headers;
       let decode = decodedToken(access_token);
       let user = await User.findByPk(decode.id);
-      if (!user) {
-        throw { name: 'NotFoundUser' };
-      }
+      
 
       await Signature.update(
         {

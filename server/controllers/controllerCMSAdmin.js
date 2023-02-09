@@ -74,14 +74,14 @@ class AdminController {
           name: { [Op.iLike]: `%${search}%` },
         };
       }
-
+      console.log(paramQuerySQL, "log query");
       let user = await User.findAll(paramQuerySQL);
+      console.log(user, "log user");
       console.log(user.length);
       if(user.length === 0) {
         throw {name: "NotFoundUser"}
       }
         res.status(200).json(user);
-
     } catch (error) {
       next(error);
     }
